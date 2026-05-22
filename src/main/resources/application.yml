@@ -1,9 +1,13 @@
 spring:
   application:
     name: sistema-matricula-utp
+  sql:
+    init:
+      mode: always
   profiles:
     active: local
   jpa:
+    defer-datasource-initialization: true
     hibernate:
       ddl-auto: validate
     show-sql: true
