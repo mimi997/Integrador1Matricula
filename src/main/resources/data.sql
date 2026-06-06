@@ -1,12 +1,12 @@
 -- Usuarios
 INSERT INTO usuario (id, email, password_hash, rol, activo) VALUES 
-(1, 'admin@utp.edu.pe', '$2a$10$wY1tvvqKkI6M7y9M.T0eN.92G6r/1.C1K7tZ9j2B6mQ4uH1H1x98i', 'ADMIN', true),
-(2, 'docente@utp.edu.pe', '$2a$10$wY1tvvqKkI6M7y9M.T0eN.92G6r/1.C1K7tZ9j2B6mQ4uH1H1x98i', 'DOCENTE', true),
-(3, 'estudiante1@utp.edu.pe', '$2a$10$wY1tvvqKkI6M7y9M.T0eN.92G6r/1.C1K7tZ9j2B6mQ4uH1H1x98i', 'ESTUDIANTE', true),
-(4, 'estudiante2@utp.edu.pe', '$2a$10$wY1tvvqKkI6M7y9M.T0eN.92G6r/1.C1K7tZ9j2B6mQ4uH1H1x98i', 'ESTUDIANTE', true),
-(5, 'estudiante3@utp.edu.pe', '$2a$10$wY1tvvqKkI6M7y9M.T0eN.92G6r/1.C1K7tZ9j2B6mQ4uH1H1x98i', 'ESTUDIANTE', true),
-(6, 'estudiante4@utp.edu.pe', '$2a$10$wY1tvvqKkI6M7y9M.T0eN.92G6r/1.C1K7tZ9j2B6mQ4uH1H1x98i', 'ESTUDIANTE', true),
-(7, 'estudiante5@utp.edu.pe', '$2a$10$wY1tvvqKkI6M7y9M.T0eN.92G6r/1.C1K7tZ9j2B6mQ4uH1H1x98i', 'ESTUDIANTE', true);
+(1, 'admin@utp.edu.pe', '$2a$10$KQh86gXxTSVRDXsvxgPOC.u2bOnt5tCzUVn4ESlAtHkHHln92bbd6', 'ADMIN', true),
+(2, 'docente@utp.edu.pe', '$2a$10$KQh86gXxTSVRDXsvxgPOC.u2bOnt5tCzUVn4ESlAtHkHHln92bbd6', 'DOCENTE', true),
+(3, 'estudiante1@utp.edu.pe', '$2a$10$KQh86gXxTSVRDXsvxgPOC.u2bOnt5tCzUVn4ESlAtHkHHln92bbd6', 'ESTUDIANTE', true),
+(4, 'estudiante2@utp.edu.pe', '$2a$10$KQh86gXxTSVRDXsvxgPOC.u2bOnt5tCzUVn4ESlAtHkHHln92bbd6', 'ESTUDIANTE', true),
+(5, 'victor.m@utp.edu.pe', '$2a$10$KQh86gXxTSVRDXsvxgPOC.u2bOnt5tCzUVn4ESlAtHkHHln92bbd6', 'ESTUDIANTE', true),
+(6, 'estudiante4@utp.edu.pe', '$2a$10$KQh86gXxTSVRDXsvxgPOC.u2bOnt5tCzUVn4ESlAtHkHHln92bbd6', 'ESTUDIANTE', true),
+(7, 'estudiante5@utp.edu.pe', '$2a$10$KQh86gXxTSVRDXsvxgPOC.u2bOnt5tCzUVn4ESlAtHkHHln92bbd6', 'ESTUDIANTE', true);
 
 -- Docente
 INSERT INTO docente (id, codigo_docente, especialidad) VALUES 

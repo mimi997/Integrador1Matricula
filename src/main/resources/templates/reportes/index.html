@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Reportes y Analíticas')}"></head>
+<body>
+
+<div class="app-layout">
+    <div th:replace="~{fragments/layout :: sidebar}"></div>
+
+    <div class="main-content">
+        <div class="topbar">
+            <div>
+                <div class="topbar-title">Reportes y Analíticas</div>
+                <div class="topbar-sub">Métricas de matrícula y rendimiento</div>
+            </div>
+            <div>
+                <button class="btn-primary-utp"><i class="bi bi-download"></i> Exportar Todo</button>
+            </div>
+        </div>
+
+        <div class="page">
+            <div class="row g-4 mb-4">
+                <div class="col-md-3">
+                    <div class="stat-card" style="border-left:4px solid var(--utp-blue);">
+                        <div class="stat-val">247</div>
+                        <div class="stat-label">Matriculados Actuales</div>
+                        <div class="stat-delta text-success"><i class="bi bi-arrow-up-short"></i> 12% vs ciclo anterior</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card" style="border-left:4px solid var(--utp-red);">
+                        <div class="stat-val">15</div>
+                        <div class="stat-label">Cursos al límite</div>
+                        <div class="stat-delta text-danger"><i class="bi bi-exclamation-circle"></i> Requieren más aulas</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card" style="border-left:4px solid #059669;">
+                        <div class="stat-val">89%</div>
+                        <div class="stat-label">Tasa de Aprobación</div>
+                        <div class="stat-delta text-success"><i class="bi bi-check-circle"></i> Promedio ponderado</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card" style="border-left:4px solid #D97706;">
+                        <div class="stat-val">34</div>
+                        <div class="stat-label">Estudiantes en Riesgo</div>
+                        <div class="stat-delta text-warning"><i class="bi bi-shield-exclamation"></i> Más de 2 cursos desaprobados</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-8">
+                    <div class="card-utp" style="height:100%;">
+                        <div class="card-header-utp">
+                            <h5>Evolución de Matrículas (Últimos 5 periodos)</h5>
+                        </div>
+                        <div class="card-body-utp" style="display:flex;align-items:center;justify-content:center;height:300px;color:var(--utp-gray);">
+                            <div class="text-center">
+                                <i class="bi bi-bar-chart-line" style="font-size:3rem;opacity:0.3;"></i>
+                                <div class="mt-2">Gráfico dinámico en construcción...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card-utp" style="height:100%;">
+                        <div class="card-header-utp">
+                            <h5>Cursos más demandados</h5>
+                        </div>
+                        <div class="card-body-utp p-0">
+                            <table class="table-utp m-0">
+                                <tbody>
+                                <tr>
+                                    <td style="font-weight:600;">Programación II</td>
+                                    <td class="text-end"><span class="badge-warn">120 mat.</span></td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight:600;">Matemática I</td>
+                                    <td class="text-end"><span class="badge-info">115 mat.</span></td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight:600;">Algoritmos</td>
+                                    <td class="text-end"><span class="badge-info">98 mat.</span></td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight:600;">Ing. de Software</td>
+                                    <td class="text-end"><span class="badge-info">87 mat.</span></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Cursos y Malla')}"></head>
+<body>
+
+<div class="app-layout">
+    <div th:replace="~{fragments/layout :: sidebar}"></div>
+
+    <div class="main-content">
+        <div class="topbar">
+            <div>
+                <div class="topbar-title">Gestión de Cursos y Malla</div>
+                <div class="topbar-sub">Administración de la oferta académica</div>
+            </div>
+            <div>
+                <button class="btn-primary-utp"><i class="bi bi-plus-lg"></i> Nuevo Curso</button>
+            </div>
+        </div>
+
+        <div class="page">
+            <div class="card-utp mb-4">
+                <div class="card-body-utp">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div style="position:relative;">
+                                <i class="bi bi-search" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--utp-gray);"></i>
+                                <input class="input-utp" style="padding-left:36px;" placeholder="Buscar por nombre o código..."/>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <select class="input-utp">
+                                <option>Todos los ciclos</option>
+                                <option>1°</option>
+                                <option>2°</option>
+                                <option>3°</option>
+                                <option>4°</option>
+                                <option>5°</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button class="btn-primary-utp w-100" style="justify-content:center;">Buscar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-utp">
+                <div class="card-header-utp">
+                    <h5>Listado de Cursos</h5>
+                    <span class="badge-info" th:text="${cursos.size()} + ' cursos'">0 cursos</span>
+                </div>
+                <div style="overflow-x:auto;">
+                    <table class="table-utp">
+                        <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Nombre</th>
+                            <th>Créditos</th>
+                            <th>Ciclo</th>
+                            <th>Cupos</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="curso : ${cursos}">
+                            <td><span class="badge-info" th:text="${curso.codigo}">COD</span></td>
+                            <td th:text="${curso.nombre}" style="font-weight:600;">Nombre</td>
+                            <td th:text="${curso.creditos}">0</td>
+                            <td th:text="${curso.ciclo} + '°'">1°</td>
+                            <td th:text="${curso.cupos}">0</td>
+                            <td>
+                                <span th:if="${curso.activo}" class="badge-ok">Activo</span>
+                                <span th:if="${!curso.activo}" class="badge-err">Inactivo</span>
+                            </td>
+                            <td>
+                                <button class="btn-outline-utp btn-sm-utp me-1"><i class="bi bi-pencil"></i></button>
+                                <button class="btn-danger-utp btn-sm-utp"><i class="bi bi-trash"></i></button>
+                            </td>
+                        </tr>
+                        <tr th:if="${cursos.isEmpty()}">
+                            <td colspan="7" class="text-center" style="color:var(--utp-gray);">No hay cursos registrados.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

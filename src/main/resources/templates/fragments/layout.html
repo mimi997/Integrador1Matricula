@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:fragment="head(title)">
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title th:text="${title} + ' - UTP'">Sistema de Matrícula UTP</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet"/>
+    <link th:href="@{/css/styles.css}" rel="stylesheet"/>
+</head>
+<body>
+
+<div th:fragment="sidebar" class="sidebar">
+    <div class="sidebar-brand">U<span style="color:var(--utp-red)">T</span>P 
+        <div class="sidebar-role" sec:authorize="hasRole('ESTUDIANTE')">Rol: Estudiante</div>
+        <div class="sidebar-role" sec:authorize="hasRole('DOCENTE')">Rol: Docente</div>
+        <div class="sidebar-role" sec:authorize="hasRole('ADMIN')">Rol: Administrador</div>
+    </div>
+    <div class="sidebar-menu">
+        <div class="menu-section">Principal</div>
+        <a th:href="@{/}" class="menu-item"><i class="bi bi-speedometer2"></i> Dashboard</a>
+        <a sec:authorize="hasRole('ESTUDIANTE')" th:href="@{/matricula}" class="menu-item"><i class="bi bi-journal-plus"></i> Matrícula</a>
+        <a sec:authorize="hasRole('ESTUDIANTE')" th:href="@{/historial}" class="menu-item"><i class="bi bi-clock-history"></i> Historial Académico</a>
+        
+        <div sec:authorize="hasRole('ADMIN') or hasRole('DOCENTE')" class="menu-section">Administración</div>
+        <a sec:authorize="hasRole('ADMIN')" th:href="@{/estudiantes}" class="menu-item"><i class="bi bi-people"></i> Estudiantes</a>
+        <a sec:authorize="hasRole('ADMIN')" th:href="@{/cursos}" class="menu-item"><i class="bi bi-book"></i> Cursos y Malla</a>
+        <a sec:authorize="hasRole('DOCENTE')" th:href="@{/notas}" class="menu-item"><i class="bi bi-pencil-square"></i> Registro Notas</a>
+        <a sec:authorize="hasRole('ADMIN')" th:href="@{/reportes}" class="menu-item"><i class="bi bi-bar-chart"></i> Reportes</a>
+    </div>
+    <div class="sidebar-footer">
+        <div class="user-chip">
+            <div class="avatar" th:text="${#strings.substring(#authentication.name,0,1).toUpperCase()}">U</div>
+            <div>
+                <div class="user-name" sec:authentication="name">User</div>
+                <form th:action="@{/logout}" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-link p-0 m-0 align-baseline user-code" style="text-decoration:none;">Cerrar sesión</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Registro Notas')}"></head>
+<body>
+
+<div class="app-layout">
+    <div th:replace="~{fragments/layout :: sidebar}"></div>
+
+    <div class="main-content">
+        <div class="topbar">
+            <div><div class="topbar-title">Registro de Notas</div><div class="topbar-sub">Período 2026-I</div></div>
+        </div>
+        <div class="page">
+            
+            <div th:if="${mensajeExito}" class="alert alert-success" th:text="${mensajeExito}"></div>
+            <div th:if="${mensajeError}" class="alert alert-danger" th:text="${mensajeError}"></div>
+
+            <div class="card-utp">
+                <div class="card-header-utp"><h5>Alumnos Matriculados</h5></div>
+                <div class="card-body-utp">
+                    <table class="table-utp">
+                        <thead><tr><th>Estudiante</th><th>Curso</th><th>Horario</th><th>Nota Actual</th><th>Acciones</th></tr></thead>
+                        <tbody>
+                            <!-- Mock de estudiantes para el prototipo -->
+                            <tr>
+                                <td>Victor Mendivil</td>
+                                <td>Ingeniería de Software I</td>
+                                <td>Lun 14:00-17:00</td>
+                                <td>-</td>
+                                <td>
+                                    <form th:action="@{/notas/registrar}" method="post" style="display:inline-flex; gap:10px;">
+                                        <input type="hidden" name="detalleMatriculaId" value="1"/>
+                                        <input type="number" name="valor" step="0.5" min="0" max="20" class="input-utp" style="width:80px; padding:6px;"/>
+                                        <button type="submit" class="btn-primary-utp btn-sm-utp">Guardar</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

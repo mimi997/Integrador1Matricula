@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Gestión de Estudiantes')}"></head>
+<body>
+
+<div class="app-layout">
+    <div th:replace="~{fragments/layout :: sidebar}"></div>
+
+    <div class="main-content">
+        <div class="topbar">
+            <div>
+                <div class="topbar-title">Gestión de Estudiantes</div>
+                <div class="topbar-sub">Administración de usuarios y roles</div>
+            </div>
+        </div>
+
+        <div class="page">
+            <div class="card-utp mb-4">
+                <div class="card-body-utp">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label" style="font-size:0.85rem;color:var(--utp-navy);font-weight:600;">Buscar estudiante</label>
+                            <div style="position:relative;">
+                                <i class="bi bi-search" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--utp-gray);"></i>
+                                <input class="input-utp" style="padding-left:36px;" placeholder="Nombre, código o email..."/>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label" style="font-size:0.85rem;color:var(--utp-navy);font-weight:600;">Carrera</label>
+                            <select class="input-utp">
+                                <option>Todas las carreras</option>
+                                <option>Ingeniería de Sistemas</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label" style="font-size:0.85rem;color:var(--utp-navy);font-weight:600;">Ciclo</label>
+                            <select class="input-utp">
+                                <option>Todos</option>
+                                <option>1°</option>
+                                <option>2°</option>
+                                <option>3°</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label" style="font-size:0.85rem;color:var(--utp-navy);font-weight:600;">Estado</label>
+                            <select class="input-utp">
+                                <option>Todos</option>
+                                <option>Activos</option>
+                                <option>Inactivos</option>
+                            </select>
+                        </div>
+                        <div class="col-md-1 d-flex align-items-end">
+                            <button class="btn-primary-utp w-100" style="justify-content:center;"><i class="bi bi-funnel"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-utp">
+                <div class="card-header-utp">
+                    <h5>Listado de Estudiantes</h5>
+                    <span class="badge-info" th:text="${estudiantes.size()} + ' registros'">0 registros</span>
+                </div>
+                <div style="overflow-x:auto;">
+                    <table class="table-utp">
+                        <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Carrera</th>
+                            <th>Ciclo</th>
+                            <th>Créditos</th>
+                            <th>Acciones</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="est : ${estudiantes}">
+                            <td><span class="badge-info" th:text="${est.codigoEstudiante}">U000</span></td>
+                            <td th:text="${est.carrera}">Carrera</td>
+                            <td th:text="${est.ciclo} + '°'">1°</td>
+                            <td th:text="${est.creditos}">0</td>
+                            <td>
+                                <button class="btn-outline-utp btn-sm-utp me-1"><i class="bi bi-pencil"></i></button>
+                                <button class="btn-danger-utp btn-sm-utp"><i class="bi bi-trash"></i></button>
+                            </td>
+                        </tr>
+                        <tr th:if="${estudiantes.isEmpty()}">
+                            <td colspan="5" class="text-center" style="color:var(--utp-gray);">No hay estudiantes registrados.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

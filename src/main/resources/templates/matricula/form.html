@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Matrícula')}"></head>
+<body>
+
+<style>
+    .curso-card{border:1.5px solid var(--utp-border);border-radius:10px;padding:16px;cursor:pointer;transition:.2s;position:relative;background:#fff;}
+    .curso-card:hover{border-color:var(--utp-blue);box-shadow:0 2px 12px rgba(41,82,204,.1);}
+    .curso-card.selected{border-color:var(--utp-blue);background:var(--utp-light);}
+    .curso-card.blocked{opacity:.5;cursor:not-allowed;background:#fafafa;}
+    .check-circle{width:22px;height:22px;border-radius:50%;border:2px solid var(--utp-border);position:absolute;top:14px;right:14px;display:flex;align-items:center;justify-content:center;}
+    .curso-card.selected .check-circle{background:var(--utp-blue);border-color:var(--utp-blue);color:#fff;}
+    .curso-code{font-size:.72rem;font-weight:700;color:var(--utp-blue);letter-spacing:.05em;}
+    .curso-name{font-size:.92rem;font-weight:600;color:var(--utp-navy);margin:4px 0;}
+    .curso-meta{font-size:.78rem;color:var(--utp-gray);}
+    .prereq-alert{background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:10px 14px;font-size:.82rem;color:#DC2626;display:flex;align-items:center;gap:8px;}
+    .prereq-ok{background:#ECFDF5;border:1px solid #A7F3D0;border-radius:8px;padding:10px 14px;font-size:.82rem;color:#059669;display:flex;align-items:center;gap:8px;}
+</style>
+
+<div class="app-layout">
+    <div th:replace="~{fragments/layout :: sidebar}"></div>
+
+    <div class="main-content">
+        <div class="topbar">
+            <div><div class="topbar-title">Proceso de Matrícula</div><div class="topbar-sub">Período 2026-I</div></div>
+            <span class="badge-period" style="background:#ECFDF5;color:#059669;border-color:#A7F3D0;"><i class="bi bi-circle-fill me-1" style="font-size:.5rem;"></i>Período activo</span>
+        </div>
+        <div class="page">
+            
+            <div th:if="${mensajeExito}" class="alert alert-success" th:text="${mensajeExito}"></div>
+            <div th:if="${mensajeError}" class="alert alert-danger" th:text="${mensajeError}"></div>
+
+            <div class="row g-4">
+                <div class="col-md-8">
+                    <div class="prereq-ok mb-3"><i class="bi bi-check-circle-fill"></i> <span>Prerrequisitos verificados automáticamente. Los cursos bloqueados requieren cursos aún no aprobados.</span></div>
+                    
+                    <form th:action="@{/matricula}" method="post" id="formMatricula">
+                        <input type="hidden" name="periodo" value="2026-I"/>
+                        <div class="card-utp mb-3">
+                            <div class="card-header-utp"><h5>Cursos disponibles</h5></div>
+                            <div class="card-body-utp">
+                                <div class="row g-2" id="cursos-grid">
+                                    <div class="col-md-6" th:each="curso : ${cursos}">
+                                        <label class="curso-card" style="display:block; cursor:pointer;">
+                                            <input type="checkbox" name="horariosIds" th:value="${curso.id}" style="display:none;" onchange="this.parentElement.classList.toggle('selected', this.checked); updateSummary();"/>
+                                            <div class="check-circle"><i class="bi bi-check" style="font-size:.8rem;"></i></div>
+                                            <div class="curso-code" th:text="${curso.codigo}">COD</div>
+                                            <div class="curso-name" th:text="${curso.nombre}">Nombre del Curso</div>
+                                            <div class="curso-meta"><i class="bi bi-clock me-1"></i><span th:text="${curso.creditos}"></span> créditos</div>
+                                            <!-- Simulando horarios para el prototipo -->
+                                            <div class="curso-meta"><i class="bi bi-calendar me-1"></i>Lun/Mié 8:00–10:00</div>
+                                            <div class="curso-meta mt-1"><span class="badge-ok" style="font-size:.7rem;">Prerrequisito: OK</span></div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-md-4">
+                    <div class="card-utp" style="position:sticky;top:0;">
+                        <div class="card-header-utp"><h5><i class="bi bi-cart3 me-2" style="color:var(--utp-blue);"></i>Resumen de Matrícula</h5></div>
+                        <div class="card-body-utp">
+                            <div id="resumen-cursos">
+                                <!-- JS llenará esto -->
+                            </div>
+                            <div style="background:var(--utp-light);border-radius:8px;padding:12px;margin:14px 0;">
+                                <div style="display:flex;justify-content:space-between;font-size:.85rem;"><span style="color:var(--utp-gray);">Cursos seleccionados</span><strong id="num-cursos">0</strong></div>
+                                <div style="display:flex;justify-content:space-between;font-size:.85rem;margin-top:6px;"><span style="color:var(--utp-gray);">Total créditos</span><strong id="total-cred">0</strong></div>
+                            </div>
+                            <button class="btn-primary-utp" style="width:100%;justify-content:center;" onclick="document.getElementById('formMatricula').submit();"><i class="bi bi-check2-circle"></i> Confirmar Matrícula</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function updateSummary() {
+    const checkboxes = document.querySelectorAll('input[name="horariosIds"]:checked');
+    document.getElementById('num-cursos').innerText = checkboxes.length;
+    // La suma de créditos requeriría atributos de datos, para el prototipo se muestra la cantidad.
+}
+</script>
+
+</body>
+</html>
