@@ -57,9 +57,12 @@
             </div>
 
             <div class="card-utp">
-                <div class="card-header-utp">
-                    <h5>Listado de Estudiantes</h5>
-                    <span class="badge-info" th:text="${estudiantes.size()} + ' registros'">0 registros</span>
+                <div class="card-header-utp" style="display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <h5>Listado de Estudiantes</h5>
+                        <span class="badge-info" th:text="${estudiantes.size()} + ' registros'">0 registros</span>
+                    </div>
+                    <a th:href="@{/estudiantes/nuevo}" class="btn-primary-utp"><i class="bi bi-plus-lg"></i> Nuevo Estudiante</a>
                 </div>
                 <div style="overflow-x:auto;">
                     <table class="table-utp">
@@ -79,8 +82,8 @@
                             <td th:text="${est.ciclo} + '°'">1°</td>
                             <td th:text="${est.creditos}">0</td>
                             <td>
-                                <button class="btn-outline-utp btn-sm-utp me-1"><i class="bi bi-pencil"></i></button>
-                                <button class="btn-danger-utp btn-sm-utp"><i class="bi bi-trash"></i></button>
+                                <a th:href="@{/estudiantes/editar/{id}(id=${est.id})}" class="btn-outline-utp btn-sm-utp me-1"><i class="bi bi-pencil"></i></a>
+                                <a th:href="@{/estudiantes/eliminar/{id}(id=${est.id})}" onclick="return confirm('¿Seguro que desea eliminar este estudiante?')" class="btn-danger-utp btn-sm-utp" style="text-decoration:none;"><i class="bi bi-trash"></i></a>
                             </td>
                         </tr>
                         <tr th:if="${estudiantes.isEmpty()}">

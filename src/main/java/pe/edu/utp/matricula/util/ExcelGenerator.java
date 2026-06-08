@@ -11,9 +11,9 @@ import java.util.List;
 @Component
 public class ExcelGenerator {
 
-    public byte[] generarReporteEstudiantes(List<String[]> data) throws IOException {
+    public byte[] generarReporte(String sheetName, String[] columns, List<String[]> data) throws IOException {
         try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-            Sheet sheet = workbook.createSheet("Estudiantes");
+            Sheet sheet = workbook.createSheet(sheetName);
 
             // Header Style
             CellStyle headerStyle = workbook.createCellStyle();
@@ -25,7 +25,6 @@ public class ExcelGenerator {
 
             // Create Headers
             Row headerRow = sheet.createRow(0);
-            String[] columns = {"Código", "Email", "Carrera", "Ciclo"};
             for (int i = 0; i < columns.length; i++) {
                 Cell cell = headerRow.createCell(i);
                 cell.setCellValue(columns[i]);
@@ -37,7 +36,7 @@ public class ExcelGenerator {
             for (String[] rowData : data) {
                 Row row = sheet.createRow(rowNum++);
                 for (int i = 0; i < rowData.length; i++) {
-                    row.createCell(i).setCellValue(rowData[i]);
+                    row.createCell(i).setCellValue(rowData[i] != null ? rowData[i] : "");
                 }
             }
 

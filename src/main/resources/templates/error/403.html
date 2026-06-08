@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Acceso Denegado')}"></head>
+<body style="background-color: var(--utp-light);">
+
+<div style="height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px;">
+    <h1 style="font-size: 6rem; color: var(--utp-red); font-weight: 800; font-family: 'Sora', sans-serif;">403</h1>
+    <h3 style="color: var(--utp-dark); margin-bottom: 20px;">Acceso Denegado</h3>
+    <p style="color: var(--utp-gray); max-width: 400px; margin-bottom: 30px;" th:text="${error != null ? error : 'No tienes los permisos necesarios para visualizar esta página.'}"></p>
+    <a th:href="@{/}" class="btn-primary-utp" style="text-decoration: none;"><i class="bi bi-house"></i> Volver al Inicio</a>
+</div>
+
+</body>
+</html>

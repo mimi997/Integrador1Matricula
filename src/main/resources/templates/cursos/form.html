@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Curso')}"></head>
+<body>
+
+<div class="app-layout">
+    <div th:replace="~{fragments/layout :: sidebar}"></div>
+
+    <div class="main-content">
+        <div class="topbar">
+            <div>
+                <div class="topbar-title" th:text="${cursoDTO.id == null ? 'Nuevo Curso' : 'Editar Curso'}">Curso</div>
+                <div class="topbar-sub">Gestión de cursos y malla</div>
+            </div>
+            <a th:href="@{/cursos}" class="btn-outline-utp"><i class="bi bi-arrow-left"></i> Volver</a>
+        </div>
+
+        <div class="page">
+            <div class="card-utp" style="max-width: 600px; margin: 0 auto;">
+                <div class="card-header-utp">
+                    <h5 th:text="${cursoDTO.id == null ? 'Datos del Nuevo Curso' : 'Modificar Curso'}">Datos</h5>
+                </div>
+                <div class="card-body-utp">
+                    
+                    <div th:if="${error}" class="alert-utp err">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <span th:text="${error}"></span>
+                    </div>
+
+                    <form th:action="@{/cursos/guardar}" th:object="${cursoDTO}" method="post">
+                        <input type="hidden" th:field="*{id}" />
+
+                        <div class="form-group">
+                            <label class="form-label">Código del Curso</label>
+                            <input type="text" class="input-utp" th:field="*{codigo}" placeholder="Ej. SIS101" required />
+                            <div th:if="${#fields.hasErrors('codigo')}" th:errors="*{codigo}" style="color:var(--utp-red);font-size:0.8rem;"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Nombre del Curso</label>
+                            <input type="text" class="input-utp" th:field="*{nombre}" placeholder="Programación Orientada a Objetos" required />
+                            <div th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}" style="color:var(--utp-red);font-size:0.8rem;"></div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 form-group">
+                                <label class="form-label">Créditos</label>
+                                <input type="number" class="input-utp" th:field="*{creditos}" min="1" required />
+                                <div th:if="${#fields.hasErrors('creditos')}" th:errors="*{creditos}" style="color:var(--utp-red);font-size:0.8rem;"></div>
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label class="form-label">Ciclo</label>
+                                <input type="number" class="input-utp" th:field="*{ciclo}" min="1" max="10" required />
+                                <div th:if="${#fields.hasErrors('ciclo')}" th:errors="*{ciclo}" style="color:var(--utp-red);font-size:0.8rem;"></div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 form-group">
+                                <label class="form-label">Carrera</label>
+                                <select class="input-utp" th:field="*{carrera}">
+                                    <option value="Ingeniería de Sistemas e Informática">Ingeniería de Sistemas e Informática</option>
+                                    <option value="Ingeniería Civil">Ingeniería Civil</option>
+                                    <option value="Ingeniería Industrial">Ingeniería Industrial</option>
+                                </select>
+                                <div th:if="${#fields.hasErrors('carrera')}" th:errors="*{carrera}" style="color:var(--utp-red);font-size:0.8rem;"></div>
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label class="form-label">Cupos</label>
+                                <input type="number" class="input-utp" th:field="*{cupos}" min="1" required />
+                                <div th:if="${#fields.hasErrors('cupos')}" th:errors="*{cupos}" style="color:var(--utp-red);font-size:0.8rem;"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-group form-check" style="margin-top: 10px;">
+                            <input type="checkbox" class="form-check-input" th:field="*{activo}" id="activoCheck" />
+                            <label class="form-check-label" for="activoCheck">Curso Activo</label>
+                        </div>
+
+                        <button type="submit" class="btn-primary-utp w-100 mt-3" style="justify-content:center;">
+                            <i class="bi bi-save"></i> Guardar Curso
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

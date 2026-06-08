@@ -18,4 +18,23 @@ public class CursoService {
     public List<Curso> listarCursosActivos() {
         return cursoRepository.findByActivoTrue();
     }
+
+    public List<Curso> findAll() {
+        return cursoRepository.findAll();
+    }
+
+    public java.util.Optional<Curso> findById(Long id) {
+        return cursoRepository.findById(id);
+    }
+
+    public Curso guardarCurso(Curso curso) {
+        return cursoRepository.save(curso);
+    }
+
+    public void eliminarCurso(Long id) {
+        cursoRepository.findById(id).ifPresent(c -> {
+            c.setActivo(false);
+            cursoRepository.save(c);
+        });
+    }
 }

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Estudiante')}"></head>
+<body>
+
+<div class="app-layout">
+    <div th:replace="~{fragments/layout :: sidebar}"></div>
+
+    <div class="main-content">
+        <div class="topbar">
+            <div>
+                <div class="topbar-title" th:text="${estudianteDTO.id == null ? 'Nuevo Estudiante' : 'Editar Estudiante'}">Estudiante</div>
+                <div class="topbar-sub">Gestión de datos de estudiante</div>
+            </div>
+            <a th:href="@{/estudiantes}" class="btn-outline-utp"><i class="bi bi-arrow-left"></i> Volver</a>
+        </div>
+
+        <div class="page">
+            <div class="card-utp" style="max-width: 600px; margin: 0 auto;">
+                <div class="card-header-utp">
+                    <h5 th:text="${estudianteDTO.id == null ? 'Datos del Nuevo Estudiante' : 'Modificar Datos'}">Datos</h5>
+                </div>
+                <div class="card-body-utp">
+                    
+                    <div th:if="${error}" class="alert-utp err">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <span th:text="${error}"></span>
+                    </div>
+
+                    <form th:action="@{/estudiantes/guardar}" th:object="${estudianteDTO}" method="post">
+                        <input type="hidden" th:field="*{id}" />
+
+                        <div class="form-group">
+                            <label class="form-label">Email Institucional</label>
+                            <input type="email" class="input-utp" th:field="*{email}" placeholder="usuario@utp.edu.pe" required />
+                            <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}" style="color:var(--utp-red);font-size:0.8rem;"></div>
+                        </div>
+
+                        <div class="form-group" th:if="${estudianteDTO.id == null}">
+                            <label class="form-label">Contraseña</label>
+                            <input type="password" class="input-utp" th:field="*{password}" placeholder="••••••••" required />
+                            <div th:if="${#fields.hasErrors('password')}" th:errors="*{password}" style="color:var(--utp-red);font-size:0.8rem;"></div>
+                        </div>
+                        <div class="form-group" th:if="${estudianteDTO.id != null}">
+                            <label class="form-label">Nueva Contraseña (Opcional)</label>
+                            <input type="password" class="input-utp" th:field="*{password}" placeholder="Dejar en blanco para no cambiar" />
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Código de Estudiante</label>
+                            <input type="text" class="input-utp" th:field="*{codigoEstudiante}" placeholder="U20201234" required />
+                            <div th:if="${#fields.hasErrors('codigoEstudiante')}" th:errors="*{codigoEstudiante}" style="color:var(--utp-red);font-size:0.8rem;"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Carrera</label>
+                            <select class="input-utp" th:field="*{carrera}">
+                                <option value="Ingeniería de Sistemas e Informática">Ingeniería de Sistemas e Informática</option>
+                                <option value="Ingeniería Civil">Ingeniería Civil</option>
+                                <option value="Ingeniería Industrial">Ingeniería Industrial</option>
+                            </select>
+                            <div th:if="${#fields.hasErrors('carrera')}" th:errors="*{carrera}" style="color:var(--utp-red);font-size:0.8rem;"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Ciclo Actual</label>
+                            <input type="number" class="input-utp" th:field="*{ciclo}" min="1" max="10" required />
+                            <div th:if="${#fields.hasErrors('ciclo')}" th:errors="*{ciclo}" style="color:var(--utp-red);font-size:0.8rem;"></div>
+                        </div>
+
+                        <button type="submit" class="btn-primary-utp w-100 mt-2" style="justify-content:center;">
+                            <i class="bi bi-save"></i> Guardar Estudiante
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import pe.edu.utp.matricula.entity.Estudiante;
+import pe.edu.utp.matricula.entity.Matricula;
 import pe.edu.utp.matricula.entity.Usuario;
 import pe.edu.utp.matricula.exception.ReglaNegocioException;
 import pe.edu.utp.matricula.repository.EstudianteRepository;
@@ -52,13 +53,23 @@ public class MatriculaController {
             Usuario user = usuarioRepository.findByEmailAndActivoTrue(auth.getName()).orElseThrow();
             Estudiante est = estudianteRepository.findById(user.getId()).orElseThrow();
 
-            matriculaService.matricular(est.getId(), horariosIds, periodo);
+            Matricula matricula = matriculaService.matricular(est.getId(), horariosIds, periodo);
             redirectAttributes.addFlashAttribute("mensajeExito", "Matrícula realizada exitosamente");
+            return "redirect:/matricula/comprobante/" + matricula.getId();
         } catch (ReglaNegocioException ex) {
             redirectAttributes.addFlashAttribute("mensajeError", ex.getMessage());
         } catch (Exception ex) {
             redirectAttributes.addFlashAttribute("mensajeError", "Ocurrió un error inesperado.");
         }
         return "redirect:/matricula";
+    }
+
+    @GetMapping("/matricula/comprobante/{id}")
+    public String verComprobante(@org.springframework.web.bind.annotation.PathVariable("id") Long id, Model model) {
+        // Here we could fetch the matricula details. We can use a repository for now.
+        // Assuming we have a MatriculaRepository or we can just fetch it somehow.
+        // Let's add it to the model.
+        model.addAttribute("matriculaId", id);
+        return "matricula/comprobante";
     }
 }

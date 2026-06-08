@@ -22,9 +22,9 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/css/**", "/js/**", "/img/**", "/webjars/**").permitAll()
-                .requestMatchers("/admin/**").hasRole("ADMIN")
-                .requestMatchers("/docente/**").hasRole("DOCENTE")
-                .requestMatchers("/estudiante/**").hasRole("ESTUDIANTE")
+                .requestMatchers("/estudiantes/**", "/cursos/**", "/periodo/**", "/reportes/**").hasRole("ADMIN")
+                .requestMatchers("/notas/**").hasAnyRole("ADMIN", "DOCENTE")
+                .requestMatchers("/matricula/**", "/historial/**").hasRole("ESTUDIANTE")
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form

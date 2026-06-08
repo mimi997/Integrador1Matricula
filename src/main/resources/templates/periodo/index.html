@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Periodo Académico')}"></head>
+<body>
+
+<div class="app-layout">
+    <div th:replace="~{fragments/layout :: sidebar}"></div>
+
+    <div class="main-content">
+        <div class="topbar">
+            <div>
+                <div class="topbar-title">Periodo Académico</div>
+                <div class="topbar-sub">Gestión de matrícula y notas</div>
+            </div>
+        </div>
+
+        <div class="page">
+            <div class="card-utp" style="max-width: 500px; margin: 0 auto;">
+                <div class="card-header-utp">
+                    <h5>Configuración del Periodo</h5>
+                </div>
+                <div class="card-body-utp">
+                    
+                    <div th:if="${param.exito}" class="alert-utp info" style="margin-bottom: 20px;">
+                        <i class="bi bi-check-circle"></i>
+                        <span>Periodo actualizado correctamente.</span>
+                    </div>
+
+                    <form th:action="@{/periodo/actualizar}" method="post">
+                        <div class="form-group">
+                            <label class="form-label">Periodo Actual</label>
+                            <input type="text" class="input-utp" name="periodo" th:value="${periodoActual}" required />
+                        </div>
+                        <div class="form-group form-check">
+                            <input type="checkbox" class="form-check-input" name="activo" id="activo" th:checked="${activo}" />
+                            <label class="form-check-label" for="activo">Matrícula Activa</label>
+                        </div>
+
+                        <button type="submit" class="btn-primary-utp w-100 mt-3" style="justify-content:center;">
+                            <i class="bi bi-save"></i> Actualizar Periodo
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

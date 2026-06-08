@@ -12,8 +12,10 @@
                 <div class="topbar-title">Reportes y Analíticas</div>
                 <div class="topbar-sub">Métricas de matrícula y rendimiento</div>
             </div>
-            <div>
-                <button class="btn-primary-utp"><i class="bi bi-download"></i> Exportar Todo</button>
+            <div style="display: flex; gap: 10px;">
+                <a th:href="@{/reportes/estudiantes}" class="btn-primary-utp"><i class="bi bi-file-earmark-excel"></i> Estudiantes</a>
+                <a th:href="@{/reportes/cursos}" class="btn-primary-utp"><i class="bi bi-file-earmark-excel"></i> Cursos</a>
+                <a th:href="@{/reportes/matriculas}" class="btn-primary-utp"><i class="bi bi-file-earmark-excel"></i> Matrículas</a>
             </div>
         </div>
 

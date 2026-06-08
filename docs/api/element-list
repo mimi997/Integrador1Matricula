@@ -1,0 +1,11 @@
+pe.edu.utp.matricula
+pe.edu.utp.matricula.config
+pe.edu.utp.matricula.controller
+pe.edu.utp.matricula.dto
+pe.edu.utp.matricula.entity
+pe.edu.utp.matricula.exception
+pe.edu.utp.matricula.repository
+pe.edu.utp.matricula.security
+pe.edu.utp.matricula.service
+pe.edu.utp.matricula.service.impl
+pe.edu.utp.matricula.util

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Comprobante de Matrícula')}"></head>
+<body>
+
+<div class="app-layout">
+    <div th:replace="~{fragments/layout :: sidebar}"></div>
+
+    <div class="main-content">
+        <div class="topbar">
+            <div>
+                <div class="topbar-title">Comprobante de Matrícula</div>
+                <div class="topbar-sub">Constancia oficial de inscripción a cursos</div>
+            </div>
+            <div>
+                <button class="btn-outline-utp" onclick="window.print()"><i class="bi bi-printer"></i> Imprimir</button>
+                <a th:href="@{/}" class="btn-primary-utp"><i class="bi bi-house"></i> Ir al Inicio</a>
+            </div>
+        </div>
+
+        <div class="page">
+            <div class="card-utp" style="max-width: 800px; margin: 0 auto; padding: 40px; border-top: 6px solid var(--utp-red);">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; border-bottom: 2px solid var(--utp-light); padding-bottom: 20px;">
+                    <div>
+                        <h2 style="font-family: 'Sora', sans-serif; font-weight: 800; color: var(--utp-navy); margin: 0;">UTP</h2>
+                        <div style="font-size: 0.9rem; color: var(--utp-gray);">Universidad Tecnológica del Perú</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-weight: 700; color: var(--utp-navy);">CONSTANCIA DE MATRÍCULA</div>
+                        <div style="font-size: 0.85rem; color: var(--utp-gray);">ID: <span th:text="${matriculaId}">000000</span></div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 30px;">
+                    <div style="font-weight: 600; color: var(--utp-navy); margin-bottom: 8px;">Datos del Estudiante:</div>
+                    <div style="font-size: 0.95rem; color: var(--utp-dark);">
+                        <div><strong>Usuario:</strong> <span sec:authentication="name"></span></div>
+                        <div><strong>Fecha:</strong> <span th:text="${#dates.format(#dates.createNow(), 'dd/MM/yyyy HH:mm')}"></span></div>
+                    </div>
+                </div>
+
+                <div class="alert-utp info" style="margin-bottom: 30px;">
+                    <i class="bi bi-check-circle-fill"></i> Su matrícula ha sido confirmada correctamente para el periodo actual.
+                </div>
+
+                <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px dashed var(--utp-border);">
+                    <div style="font-size: 0.85rem; color: var(--utp-gray);">Documento generado por el Sistema de Matrícula UTP</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

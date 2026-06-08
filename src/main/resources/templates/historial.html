@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Historial Académico')}"></head>
+<body>
+
+<div class="app-layout">
+    <div th:replace="~{fragments/layout :: sidebar}"></div>
+
+    <div class="main-content">
+        <div class="topbar">
+            <div>
+                <div class="topbar-title">Historial Académico</div>
+                <div class="topbar-sub">Consulta de notas y estado de cursos</div>
+            </div>
+            <div>
+                <button class="btn-outline-utp"><i class="bi bi-printer"></i> Imprimir Récord</button>
+            </div>
+        </div>
+
+        <div class="page">
+            <div class="card-utp">
+                <div class="card-header-utp">
+                    <h5>Mis Calificaciones</h5>
+                    <span class="badge-info" th:text="${notas.size()} + ' cursos registrados'">0 cursos registrados</span>
+                </div>
+                <div style="overflow-x:auto;">
+                    <table class="table-utp">
+                        <thead>
+                        <tr>
+                            <th>Periodo</th>
+                            <th>Curso</th>
+                            <th>Docente</th>
+                            <th>Créditos</th>
+                            <th>Nota Final</th>
+                            <th>Estado</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="nota : ${notas}">
+                            <td th:text="${nota.detalleMatricula.matricula.periodo}">2026-1</td>
+                            <td th:text="${nota.detalleMatricula.horario.curso.nombre}" style="font-weight:600;">Curso</td>
+                            <td th:text="${nota.docente.usuario.email}">Docente</td>
+                            <td th:text="${nota.detalleMatricula.horario.curso.creditos}">0</td>
+                            <td th:text="${nota.valor}" style="font-weight:700;">-</td>
+                            <td>
+                                <span th:if="${nota.aprobado}" class="badge-ok">Aprobado</span>
+                                <span th:if="${!nota.aprobado}" class="badge-err">Desaprobado</span>
+                            </td>
+                        </tr>
+                        <tr th:if="${notas.isEmpty()}">
+                            <td colspan="6" class="text-center" style="color:var(--utp-gray);">No hay registros en el historial.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
