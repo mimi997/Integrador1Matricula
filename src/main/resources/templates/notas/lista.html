@@ -7,38 +7,44 @@
     <div th:replace="~{fragments/layout :: sidebar}"></div>
 
     <div class="main-content">
-        <div class="topbar">
-            <div><div class="topbar-title">Registro de Notas</div><div class="topbar-sub">Período 2026-I</div></div>
-        </div>
-        <div class="page">
-            
-            <div th:if="${mensajeExito}" class="alert alert-success" th:text="${mensajeExito}"></div>
-            <div th:if="${mensajeError}" class="alert alert-danger" th:text="${mensajeError}"></div>
-
-            <div class="card-utp">
-                <div class="card-header-utp"><h5>Alumnos Matriculados</h5></div>
-                <div class="card-body-utp">
-                    <table class="table-utp">
-                        <thead><tr><th>Estudiante</th><th>Curso</th><th>Horario</th><th>Nota Actual</th><th>Acciones</th></tr></thead>
-                        <tbody>
-                            <!-- Mock de estudiantes para el prototipo -->
-                            <tr>
-                                <td>Victor Mendivil</td>
-                                <td>Ingeniería de Software I</td>
-                                <td>Lun 14:00-17:00</td>
-                                <td>-</td>
-                                <td>
-                                    <form th:action="@{/notas/registrar}" method="post" style="display:inline-flex; gap:10px;">
-                                        <input type="hidden" name="detalleMatriculaId" value="1"/>
-                                        <input type="number" name="valor" step="0.5" min="0" max="20" class="input-utp" style="width:80px; padding:6px;"/>
-                                        <button type="submit" class="btn-primary-utp btn-sm-utp">Guardar</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+            <div class="topbar">
+                <div><div class="topbar-title">Registro de Notas</div><div class="topbar-sub">Período <span th:text="${periodoActual}">2026-I</span></div></div>
             </div>
+            <div class="page">
+                
+                <div th:if="${mensajeExito}" class="alert alert-success" th:text="${mensajeExito}"></div>
+                <div th:if="${mensajeError}" class="alert alert-danger" th:text="${mensajeError}"></div>
+    
+                <div class="card-utp">
+                    <div class="card-header-utp"><h5>Alumnos Matriculados</h5></div>
+                    <div class="card-body-utp">
+                        <table class="table-utp">
+                            <thead><tr><th>Estudiante</th><th>Curso</th><th>Horario</th><th>Nota Actual</th><th>Acciones</th></tr></thead>
+                            <tbody>
+                                <tr th:each="det : ${detalles}">
+                                    <td th:text="${det.matricula.estudiante.usuario.nombres + ' ' + det.matricula.estudiante.usuario.apellidos}">Estudiante</td>
+                                    <td th:text="${det.horario.curso.nombre}">Curso</td>
+                                    <td th:text="${det.horario.dia + ' ' + det.horario.horas}">Horario</td>
+                                    <td>
+                                        <span th:text="${notas.containsKey(det.id) ? notas.get(det.id) : '-'}">-</span>
+                                        <span th:if="${notas.containsKey(det.id)}" 
+                                              th:text="${notas.get(det.id) >= 10.5 ? ' (Aprobado)' : ' (Desaprobado)'}"
+                                              th:class="${notas.get(det.id) >= 10.5 ? 'text-success' : 'text-danger'}" 
+                                              style="font-size:0.8rem; font-weight:bold;"></span>
+                                    </td>
+                                    <td>
+                                        <form th:action="@{/notas/registrar}" method="post" style="display:inline-flex; gap:10px;">
+                                            <input type="hidden" name="detalleMatriculaId" th:value="${det.id}"/>
+                                            <input type="number" name="valor" step="0.5" min="0" max="20" class="input-utp" style="width:80px; padding:6px;"
+                                                   th:value="${notas.containsKey(det.id) ? notas.get(det.id) : ''}"/>
+                                            <button type="submit" class="btn-primary-utp btn-sm-utp">Guardar</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
 
         </div>
     </div>

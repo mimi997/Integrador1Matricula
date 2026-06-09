@@ -32,6 +32,12 @@ public class Usuario {
     @Column(nullable = false)
     private Boolean activo = true;
 
+    @Column(length = 100)
+    private String nombres;
+
+    @Column(length = 100)
+    private String apellidos;
+
     public Usuario() {
     }
 
@@ -40,6 +46,15 @@ public class Usuario {
         this.passwordHash = passwordHash;
         this.rol = rol;
         this.activo = activo;
+    }
+
+    public Usuario(String email, String passwordHash, RolUsuario rol, Boolean activo, String nombres, String apellidos) {
+        this.email = email;
+        this.passwordHash = passwordHash;
+        this.rol = rol;
+        this.activo = activo;
+        this.nombres = nombres;
+        this.apellidos = apellidos;
     }
 
     public Long getId() {
@@ -80,6 +95,22 @@ public class Usuario {
 
     public void setActivo(Boolean activo) {
         this.activo = activo;
+    }
+
+    public String getNombres() {
+        return nombres;
+    }
+
+    public void setNombres(String nombres) {
+        this.nombres = nombres;
+    }
+
+    public String getApellidos() {
+        return apellidos;
+    }
+
+    public void setApellidos(String apellidos) {
+        this.apellidos = apellidos;
     }
 
     @Override

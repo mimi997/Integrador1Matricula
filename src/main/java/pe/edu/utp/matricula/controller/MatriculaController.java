@@ -27,20 +27,42 @@ public class MatriculaController {
     private final MatriculaService matriculaService;
     private final UsuarioRepository usuarioRepository;
     private final EstudianteRepository estudianteRepository;
+    private final pe.edu.utp.matricula.service.ValidadorPrerrequisitos validadorPrerrequisitos;
+    private final pe.edu.utp.matricula.service.PeriodoService periodoService;
+    private final pe.edu.utp.matricula.repository.MatriculaRepository matriculaRepository;
+    private final pe.edu.utp.matricula.repository.DetalleMatriculaRepository detalleMatriculaRepository;
+    private final pe.edu.utp.matricula.repository.HorarioRepository horarioRepository;
+    private final pe.edu.utp.matricula.service.DetectorConflictoHorario detectorConflictoHorario;
 
-    public MatriculaController(CursoService cursoService, HorarioService horarioService, MatriculaService matriculaService, UsuarioRepository usuarioRepository, EstudianteRepository estudianteRepository) {
+    public MatriculaController(CursoService cursoService, HorarioService horarioService, MatriculaService matriculaService, UsuarioRepository usuarioRepository, EstudianteRepository estudianteRepository, pe.edu.utp.matricula.service.ValidadorPrerrequisitos validadorPrerrequisitos, pe.edu.utp.matricula.service.PeriodoService periodoService, pe.edu.utp.matricula.repository.MatriculaRepository matriculaRepository, pe.edu.utp.matricula.repository.DetalleMatriculaRepository detalleMatriculaRepository, pe.edu.utp.matricula.repository.HorarioRepository horarioRepository, pe.edu.utp.matricula.service.DetectorConflictoHorario detectorConflictoHorario) {
         this.cursoService = cursoService;
         this.horarioService = horarioService;
         this.matriculaService = matriculaService;
         this.usuarioRepository = usuarioRepository;
         this.estudianteRepository = estudianteRepository;
+        this.validadorPrerrequisitos = validadorPrerrequisitos;
+        this.periodoService = periodoService;
+        this.matriculaRepository = matriculaRepository;
+        this.detalleMatriculaRepository = detalleMatriculaRepository;
+        this.horarioRepository = horarioRepository;
+        this.detectorConflictoHorario = detectorConflictoHorario;
     }
 
     @GetMapping("/matricula")
     public String verFormularioMatricula(Model model, Authentication auth) {
-        model.addAttribute("cursos", cursoService.listarCursosActivos());
-        // En una app real, se cargan los horarios mediante AJAX al seleccionar un curso,
-        // o se envía la lista de cursos con sus horarios
+        Usuario user = usuarioRepository.findByEmailAndActivoTrue(auth.getName()).orElse(null);
+        if (user == null) return "redirect:/";
+        
+        List<pe.edu.utp.matricula.entity.Curso> aprobados = estudianteRepository.findCursosAprobados(user.getId());
+        List<Long> idsAprobados = aprobados.stream().map(pe.edu.utp.matricula.entity.Curso::getId).collect(java.util.stream.Collectors.toList());
+        
+        List<pe.edu.utp.matricula.entity.Horario> horariosDisponibles = horarioService.listarTodos().stream()
+                .filter(h -> validadorPrerrequisitos.cumplePrerrequisitos(user.getId(), h.getCurso()))
+                .filter(h -> !idsAprobados.contains(h.getCurso().getId()))
+                .collect(java.util.stream.Collectors.toList());
+                
+        model.addAttribute("horarios", horariosDisponibles);
+        model.addAttribute("periodoActual", periodoService.getPeriodoActual());
         return "matricula/form";
     }
 
@@ -66,10 +88,67 @@ public class MatriculaController {
 
     @GetMapping("/matricula/comprobante/{id}")
     public String verComprobante(@org.springframework.web.bind.annotation.PathVariable("id") Long id, Model model) {
-        // Here we could fetch the matricula details. We can use a repository for now.
-        // Assuming we have a MatriculaRepository or we can just fetch it somehow.
-        // Let's add it to the model.
-        model.addAttribute("matriculaId", id);
+        Matricula matricula = matriculaRepository.findById(id)
+                .orElseThrow(() -> new pe.edu.utp.matricula.exception.RecursoNoEncontradoException("Matrícula no encontrada"));
+        
+        List<pe.edu.utp.matricula.entity.DetalleMatricula> detalles = detalleMatriculaRepository.findByMatriculaId(id);
+        int totalCreditos = detalles.stream()
+                .mapToInt(d -> d.getHorario().getCurso().getCreditos())
+                .sum();
+        
+        model.addAttribute("matricula", matricula);
+        model.addAttribute("estudiante", matricula.getEstudiante());
+        model.addAttribute("detalles", detalles);
+        model.addAttribute("totalCreditos", totalCreditos);
+        model.addAttribute("periodo", matricula.getPeriodo());
+        model.addAttribute("fecha", new java.util.Date());
         return "matricula/comprobante";
+    }
+
+    @PostMapping("/matricula/cancelar/{detalleId}")
+    public String cancelarMatriculaDetalle(@org.springframework.web.bind.annotation.PathVariable("detalleId") Long detalleId,
+                                           Authentication auth,
+                                           RedirectAttributes redirectAttributes) {
+        try {
+            Usuario user = usuarioRepository.findByEmailAndActivoTrue(auth.getName()).orElseThrow();
+            matriculaService.cancelarDetalle(user.getId(), detalleId);
+            redirectAttributes.addFlashAttribute("mensajeExito", "Matrícula del curso cancelada correctamente.");
+        } catch (ReglaNegocioException ex) {
+            redirectAttributes.addFlashAttribute("mensajeError", ex.getMessage());
+        } catch (Exception ex) {
+            redirectAttributes.addFlashAttribute("mensajeError", "Ocurrió un error inesperado al cancelar la matrícula del curso.");
+        }
+        return "redirect:/matricula";
+    }
+
+    @GetMapping("/matricula/validar")
+    @org.springframework.web.bind.annotation.ResponseBody
+    public java.util.Map<String, Object> validarHorario(@RequestParam Long horarioId, Authentication auth) {
+        java.util.Map<String, Object> response = new java.util.HashMap<>();
+        try {
+            Usuario user = usuarioRepository.findByEmailAndActivoTrue(auth.getName()).orElseThrow();
+            pe.edu.utp.matricula.entity.Horario horario = horarioRepository.findById(horarioId)
+                    .orElseThrow(() -> new pe.edu.utp.matricula.exception.RecursoNoEncontradoException("Horario no encontrado"));
+            
+            // Validar prerrequisitos
+            validadorPrerrequisitos.validar(user.getId(), horario.getCurso());
+            
+            // Validar conflicto de horario
+            List<pe.edu.utp.matricula.entity.Horario> horariosExistentes = horarioRepository.findHorariosByEstudianteAndPeriodo(user.getId(), periodoService.getPeriodoActual());
+            if (detectorConflictoHorario.hayConflicto(horario, horariosExistentes)) {
+                response.put("ok", false);
+                response.put("motivo", "Existe conflicto de horario con el curso: " + horario.getCurso().getNombre());
+                return response;
+            }
+            
+            response.put("ok", true);
+        } catch (ReglaNegocioException ex) {
+            response.put("ok", false);
+            response.put("motivo", ex.getMessage());
+        } catch (Exception ex) {
+            response.put("ok", false);
+            response.put("motivo", "Error al validar.");
+        }
+        return response;
     }
 }

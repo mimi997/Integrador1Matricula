@@ -17,13 +17,55 @@ public class ReporteService {
     private final EstudianteRepository estudianteRepository;
     private final CursoRepository cursoRepository;
     private final MatriculaRepository matriculaRepository;
+    private final pe.edu.utp.matricula.repository.NotaRepository notaRepository;
+    private final pe.edu.utp.matricula.repository.DetalleMatriculaRepository detalleMatriculaRepository;
 
     public ReporteService(ExcelGenerator excelGenerator, EstudianteRepository estudianteRepository,
-                          CursoRepository cursoRepository, MatriculaRepository matriculaRepository) {
+                          CursoRepository cursoRepository, MatriculaRepository matriculaRepository,
+                          pe.edu.utp.matricula.repository.NotaRepository notaRepository,
+                          pe.edu.utp.matricula.repository.DetalleMatriculaRepository detalleMatriculaRepository) {
         this.excelGenerator = excelGenerator;
         this.estudianteRepository = estudianteRepository;
         this.cursoRepository = cursoRepository;
         this.matriculaRepository = matriculaRepository;
+        this.notaRepository = notaRepository;
+        this.detalleMatriculaRepository = detalleMatriculaRepository;
+    }
+
+    public long getCursosAlLimite() {
+        return cursoRepository.findAll().stream().filter(c -> c.getCupos() <= 5).count();
+    }
+
+    public double getTasaAprobacion() {
+        List<pe.edu.utp.matricula.entity.Nota> notas = notaRepository.findAll();
+        if (notas.isEmpty()) return 100.0;
+        long aprobadas = notas.stream().filter(pe.edu.utp.matricula.entity.Nota::getAprobado).count();
+        return (double) aprobadas * 100.0 / notas.size();
+    }
+
+    public long getEstudiantesRiesgo() {
+        return notaRepository.findAll().stream()
+                .filter(n -> !n.getAprobado())
+                .map(n -> n.getDetalleMatricula().getMatricula().getEstudiante().getId())
+                .distinct()
+                .count();
+    }
+
+    public List<java.util.Map<String, Object>> getCursosMasDemandados() {
+        List<pe.edu.utp.matricula.entity.DetalleMatricula> detalles = detalleMatriculaRepository.findAll();
+        java.util.Map<pe.edu.utp.matricula.entity.Curso, Long> counts = detalles.stream()
+                .collect(Collectors.groupingBy(d -> d.getHorario().getCurso(), Collectors.counting()));
+        
+        return counts.entrySet().stream()
+                .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue()))
+                .limit(5)
+                .map(e -> {
+                    java.util.Map<String, Object> map = new java.util.HashMap<>();
+                    map.put("nombre", e.getKey().getNombre());
+                    map.put("matriculados", e.getValue());
+                    return map;
+                })
+                .collect(Collectors.toList());
     }
 
     public byte[] exportarEstudiantes() throws IOException {

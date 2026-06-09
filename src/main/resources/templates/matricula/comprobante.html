@@ -3,6 +3,17 @@
 <head th:replace="~{fragments/layout :: head('Comprobante de Matrícula')}"></head>
 <body>
 
+<style>
+    @media print {
+        body { background: white !important; color: black !important; }
+        .app-layout { display: block !important; }
+        .sidebar, .topbar, .btn-outline-utp, .btn-primary-utp, header, footer, .no-print { display: none !important; }
+        .main-content { margin: 0 !important; padding: 0 !important; }
+        .page { padding: 0 !important; }
+        .card-utp { border: none !important; box-shadow: none !important; padding: 0 !important; width: 100% !important; max-width: 100% !important; }
+    }
+</style>
+
 <div class="app-layout">
     <div th:replace="~{fragments/layout :: sidebar}"></div>
 
@@ -19,6 +30,9 @@
         </div>
 
         <div class="page">
+            <div th:if="${mensajeExito}" class="alert alert-success" th:text="${mensajeExito}"></div>
+            <div th:if="${mensajeError}" class="alert alert-danger" th:text="${mensajeError}"></div>
+
             <div class="card-utp" style="max-width: 800px; margin: 0 auto; padding: 40px; border-top: 6px solid var(--utp-red);">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; border-bottom: 2px solid var(--utp-light); padding-bottom: 20px;">
                     <div>
@@ -27,16 +41,65 @@
                     </div>
                     <div style="text-align: right;">
                         <div style="font-weight: 700; color: var(--utp-navy);">CONSTANCIA DE MATRÍCULA</div>
-                        <div style="font-size: 0.85rem; color: var(--utp-gray);">ID: <span th:text="${matriculaId}">000000</span></div>
+                        <div style="font-size: 0.85rem; color: var(--utp-gray);">ID: <span th:text="${matricula.id}">000000</span></div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div>
+                        <div style="font-weight: 600; color: var(--utp-navy); margin-bottom: 8px;">Datos del Estudiante:</div>
+                        <div style="font-size: 0.95rem; color: var(--utp-dark);">
+                            <div><strong>Nombre:</strong> <span th:text="${estudiante.usuario.nombres + ' ' + estudiante.usuario.apellidos}">Nombre</span></div>
+                            <div><strong>Código:</strong> <span th:text="${estudiante.codigoEstudiante}">U123456</span></div>
+                            <div><strong>Carrera:</strong> <span th:text="${estudiante.carrera}">Carrera</span></div>
+                            <div><strong>Ciclo:</strong> <span th:text="${estudiante.ciclo}">Ciclo</span></div>
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-weight: 600; color: var(--utp-navy); margin-bottom: 8px;">Datos de Matrícula:</div>
+                        <div style="font-size: 0.95rem; color: var(--utp-dark);">
+                            <div><strong>Periodo:</strong> <span th:text="${periodo}">2026-I</span></div>
+                            <div><strong>Fecha:</strong> <span th:text="${#dates.format(fecha, 'dd/MM/yyyy HH:mm')}"></span></div>
+                            <div><strong>Estado:</strong> <span class="badge bg-success" th:text="${matricula.estado}">Confirmada</span></div>
+                        </div>
                     </div>
                 </div>
 
                 <div style="margin-bottom: 30px;">
-                    <div style="font-weight: 600; color: var(--utp-navy); margin-bottom: 8px;">Datos del Estudiante:</div>
-                    <div style="font-size: 0.95rem; color: var(--utp-dark);">
-                        <div><strong>Usuario:</strong> <span sec:authentication="name"></span></div>
-                        <div><strong>Fecha:</strong> <span th:text="${#dates.format(#dates.createNow(), 'dd/MM/yyyy HH:mm')}"></span></div>
-                    </div>
+                    <div style="font-weight: 600; color: var(--utp-navy); margin-bottom: 12px;">Cursos Registrados:</div>
+                    <table class="table" style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid var(--utp-border); text-align: left;">
+                                <th style="padding: 10px 5px;">Código</th>
+                                <th style="padding: 10px 5px;">Curso</th>
+                                <th style="padding: 10px 5px; text-align: center;">Créditos</th>
+                                <th style="padding: 10px 5px;">Horario</th>
+                                <th style="padding: 10px 5px;">Aula</th>
+                                <th style="padding: 10px 5px; text-align: center;" class="no-print">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="det : ${detalles}" style="border-bottom: 1px solid var(--utp-light);">
+                                <td style="padding: 10px 5px;" th:text="${det.horario.curso.codigo}">INF-301</td>
+                                <td style="padding: 10px 5px;" th:text="${det.horario.curso.nombre}">Curso</td>
+                                <td style="padding: 10px 5px; text-align: center;" th:text="${det.horario.curso.creditos}">4</td>
+                                <td style="padding: 10px 5px;" th:text="${det.horario.dia + ' ' + det.horario.horas}">Lunes 08:00-10:00</td>
+                                <td style="padding: 10px 5px;" th:text="${det.horario.aula}">Aula</td>
+                                <td style="padding: 10px 5px; text-align: center;" class="no-print">
+                                    <form th:action="@{/matricula/cancelar/{detalleId}(detalleId=${det.id})}" method="post" onsubmit="return confirm('¿Está seguro de que desea cancelar la matrícula de este curso?');" style="display:inline;">
+                                        <button type="submit" class="btn btn-link text-danger p-0 m-0" style="font-size: 0.85rem; text-decoration:none;"><i class="bi bi-trash"></i> Cancelar</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr style="font-weight: 700; border-top: 2px solid var(--utp-border);">
+                                <td colspan="2" style="padding: 15px 5px; text-align: right;">Total Créditos Matriculados:</td>
+                                <td style="padding: 15px 5px; text-align: center;" th:text="${totalCreditos}">0</td>
+                                <td colspan="4"></td>
+                            </tr>
+                        </tfoot>
+                    </table>
                 </div>
 
                 <div class="alert-utp info" style="margin-bottom: 30px;">

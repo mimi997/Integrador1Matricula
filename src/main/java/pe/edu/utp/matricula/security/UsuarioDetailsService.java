@@ -8,11 +8,14 @@ import org.springframework.stereotype.Service;
 import pe.edu.utp.matricula.entity.Usuario;
 import pe.edu.utp.matricula.repository.UsuarioRepository;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.Collections;
 
 @Service
 public class UsuarioDetailsService implements UserDetailsService {
 
+    private static final Logger log = LoggerFactory.getLogger(UsuarioDetailsService.class);
     private final UsuarioRepository usuarioRepository;
 
     public UsuarioDetailsService(UsuarioRepository usuarioRepository) {
@@ -21,8 +24,14 @@ public class UsuarioDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        log.info("Intento de login para usuario: {}", username);
         Usuario usuario = usuarioRepository.findByEmailAndActivoTrue(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado o inactivo: " + username));
+                .orElseThrow(() -> {
+                    log.warn("Login fallido. Usuario no encontrado o inactivo: {}", username);
+                    return new UsernameNotFoundException("Usuario no encontrado o inactivo: " + username);
+                });
+
+        log.info("Login exitoso. Usuario: {}, Rol: {}", usuario.getEmail(), usuario.getRol().name());
 
         return new org.springframework.security.core.userdetails.User(
                 usuario.getEmail(),

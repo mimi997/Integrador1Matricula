@@ -23,28 +23,28 @@
             <div class="row g-4 mb-4">
                 <div class="col-md-3">
                     <div class="stat-card" style="border-left:4px solid var(--utp-blue);">
-                        <div class="stat-val">247</div>
+                        <div class="stat-val" th:text="${totalEstudiantes != null ? totalEstudiantes : 0}">247</div>
                         <div class="stat-label">Matriculados Actuales</div>
                         <div class="stat-delta text-success"><i class="bi bi-arrow-up-short"></i> 12% vs ciclo anterior</div>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="stat-card" style="border-left:4px solid var(--utp-red);">
-                        <div class="stat-val">15</div>
+                        <div class="stat-val" th:text="${cursosAlLimite != null ? cursosAlLimite : 0}">15</div>
                         <div class="stat-label">Cursos al límite</div>
                         <div class="stat-delta text-danger"><i class="bi bi-exclamation-circle"></i> Requieren más aulas</div>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="stat-card" style="border-left:4px solid #059669;">
-                        <div class="stat-val">89%</div>
+                        <div class="stat-val" th:text="${tasaAprobacion != null ? tasaAprobacion + '%' : '0%'}">89%</div>
                         <div class="stat-label">Tasa de Aprobación</div>
                         <div class="stat-delta text-success"><i class="bi bi-check-circle"></i> Promedio ponderado</div>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="stat-card" style="border-left:4px solid #D97706;">
-                        <div class="stat-val">34</div>
+                        <div class="stat-val" th:text="${estudiantesRiesgo != null ? estudiantesRiesgo : 0}">34</div>
                         <div class="stat-label">Estudiantes en Riesgo</div>
                         <div class="stat-delta text-warning"><i class="bi bi-shield-exclamation"></i> Más de 2 cursos desaprobados</div>
                     </div>
@@ -73,21 +73,12 @@
                         <div class="card-body-utp p-0">
                             <table class="table-utp m-0">
                                 <tbody>
-                                <tr>
-                                    <td style="font-weight:600;">Programación II</td>
-                                    <td class="text-end"><span class="badge-warn">120 mat.</span></td>
+                                <tr th:each="curso : ${cursosDemandados}">
+                                    <td style="font-weight:600;" th:text="${curso.nombre}">Programación II</td>
+                                    <td class="text-end"><span class="badge-info" th:text="${curso.matriculados} + ' mat.'">120 mat.</span></td>
                                 </tr>
-                                <tr>
-                                    <td style="font-weight:600;">Matemática I</td>
-                                    <td class="text-end"><span class="badge-info">115 mat.</span></td>
-                                </tr>
-                                <tr>
-                                    <td style="font-weight:600;">Algoritmos</td>
-                                    <td class="text-end"><span class="badge-info">98 mat.</span></td>
-                                </tr>
-                                <tr>
-                                    <td style="font-weight:600;">Ing. de Software</td>
-                                    <td class="text-end"><span class="badge-info">87 mat.</span></td>
+                                <tr th:if="${cursosDemandados == null or #lists.isEmpty(cursosDemandados)}">
+                                    <td colspan="2" class="text-center text-muted">Sin datos suficientes</td>
                                 </tr>
                                 </tbody>
                             </table>

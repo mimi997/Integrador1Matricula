@@ -43,6 +43,11 @@ public class EstudianteServiceImpl implements EstudianteService {
         Usuario usuario;
         Estudiante estudiante;
 
+        // Validar y normalizar entradas
+        pe.edu.utp.matricula.util.Validaciones.requireValidEmail(dto.getEmail());
+        String carreraNormalizada = pe.edu.utp.matricula.util.Validaciones.normalizar(dto.getCarrera());
+        String codigoNormalizado = pe.edu.utp.matricula.util.Validaciones.normalizar(dto.getCodigoEstudiante());
+
         if (dto.getId() != null) {
             // Edit existing
             estudiante = estudianteRepository.findById(dto.getId())
@@ -66,8 +71,8 @@ public class EstudianteServiceImpl implements EstudianteService {
 
         usuarioRepository.save(usuario);
 
-        estudiante.setCodigoEstudiante(dto.getCodigoEstudiante());
-        estudiante.setCarrera(dto.getCarrera());
+        estudiante.setCodigoEstudiante(codigoNormalizado);
+        estudiante.setCarrera(carreraNormalizada);
         estudiante.setCiclo(dto.getCiclo());
         estudiante.setCreditos(0); // Defaults to 0 or could be preserved on update
         if (dto.getId() != null) {

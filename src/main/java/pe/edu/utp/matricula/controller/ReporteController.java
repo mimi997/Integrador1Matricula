@@ -15,13 +15,25 @@ import java.io.IOException;
 public class ReporteController {
 
     private final ReporteService reporteService;
+    private final pe.edu.utp.matricula.repository.EstudianteRepository estudianteRepository;
+    private final pe.edu.utp.matricula.repository.CursoRepository cursoRepository;
 
-    public ReporteController(ReporteService reporteService) {
+    public ReporteController(ReporteService reporteService, 
+                             pe.edu.utp.matricula.repository.EstudianteRepository estudianteRepository,
+                             pe.edu.utp.matricula.repository.CursoRepository cursoRepository) {
         this.reporteService = reporteService;
+        this.estudianteRepository = estudianteRepository;
+        this.cursoRepository = cursoRepository;
     }
 
     @GetMapping
-    public String index() {
+    public String index(org.springframework.ui.Model model) {
+        model.addAttribute("totalEstudiantes", estudianteRepository.count());
+        model.addAttribute("totalCursos", cursoRepository.count());
+        model.addAttribute("cursosAlLimite", reporteService.getCursosAlLimite());
+        model.addAttribute("tasaAprobacion", String.format(java.util.Locale.US, "%.1f", reporteService.getTasaAprobacion()));
+        model.addAttribute("estudiantesRiesgo", reporteService.getEstudiantesRiesgo());
+        model.addAttribute("cursosDemandados", reporteService.getCursosMasDemandados());
         return "reportes/index";
     }
 

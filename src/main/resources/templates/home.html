@@ -10,9 +10,9 @@
         <div class="topbar">
             <div>
                 <div class="topbar-title">Dashboard</div>
-                <div class="topbar-sub">Bienvenido(a), <span sec:authentication="name"></span>.</div>
+                <div class="topbar-sub">Bienvenido(a), <span th:text="${nombreUsuario != null ? nombreUsuario : #authentication.name}"></span>.</div>
             </div>
-            <span class="badge-period"><i class="bi bi-calendar3 me-1"></i>Período: 2026-I</span>
+            <span class="badge-period"><i class="bi bi-calendar3 me-1"></i>Período: <span th:text="${periodoActual}">2026-I</span></span>
         </div>
         <div class="page">
             
@@ -23,15 +23,20 @@
                     <div class="col-md-3">
                         <div class="stat-card">
                             <div class="stat-icon" style="background:#EFF6FF;color:#2952CC;"><i class="bi bi-book-half"></i></div>
-                            <div class="stat-val">5</div>
+                            <div class="stat-val" th:text="${cursosMatriculados != null ? cursosMatriculados : 0}">5</div>
                             <div class="stat-label">Cursos matriculados</div>
-                            <div class="stat-delta" style="color:#059669;"><i class="bi bi-check-circle-fill"></i> Confirmados</div>
+                            <div class="stat-delta" style="color:#059669;">
+                                <i class="bi bi-check-circle-fill"></i> Confirmados
+                                <span th:if="${cursosMatriculados > 0}">
+                                    · <a th:href="@{/matricula/comprobante/{id}(id=${matriculaId})}" style="font-size:0.75rem; text-decoration:none; font-weight:600;"><i class="bi bi-file-earmark-text"></i> Comprobante</a>
+                                </span>
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="stat-card">
                             <div class="stat-icon" style="background:#ECFDF5;color:#059669;"><i class="bi bi-trophy"></i></div>
-                            <div class="stat-val">12</div>
+                            <div class="stat-val" th:text="${estudianteCreditos != null ? estudianteCreditos : 0}">12</div>
                             <div class="stat-label">Créditos acumulados</div>
                             <div class="stat-delta" style="color:var(--utp-gray);">de 180 totales</div>
                         </div>
@@ -39,7 +44,7 @@
                     <div class="col-md-3">
                         <div class="stat-card">
                             <div class="stat-icon" style="background:#FFFBEB;color:#D97706;"><i class="bi bi-hourglass-split"></i></div>
-                            <div class="stat-val">3</div>
+                            <div class="stat-val" th:text="${estudianteCiclo != null ? estudianteCiclo : 0}">3</div>
                             <div class="stat-label">Ciclo actual</div>
                             <div class="stat-delta" style="color:var(--utp-gray);">Sistemas</div>
                         </div>
@@ -52,14 +57,14 @@
                     <div class="col-md-3">
                         <div class="stat-card">
                             <div class="stat-icon" style="background:#EFF6FF;color:#2952CC;"><i class="bi bi-people"></i></div>
-                            <div class="stat-val">247</div>
+                            <div class="stat-val" th:text="${totalEstudiantes != null ? totalEstudiantes : 0}">247</div>
                             <div class="stat-label">Total Estudiantes</div>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="stat-card">
                             <div class="stat-icon" style="background:#ECFDF5;color:#059669;"><i class="bi bi-book"></i></div>
-                            <div class="stat-val">48</div>
+                            <div class="stat-val" th:text="${totalCursos != null ? totalCursos : 0}">48</div>
                             <div class="stat-label">Cursos Registrados</div>
                         </div>
                     </div>
@@ -71,7 +76,7 @@
                     <div class="col-md-4">
                         <div class="stat-card">
                             <div class="stat-icon" style="background:#EFF6FF;color:#2952CC;"><i class="bi bi-journal-text"></i></div>
-                            <div class="stat-val">3</div>
+                            <div class="stat-val" th:text="${cursosACargo != null ? cursosACargo : 0}">3</div>
                             <div class="stat-label">Cursos a cargo</div>
                         </div>
                     </div>

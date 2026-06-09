@@ -22,7 +22,7 @@
 
     <div class="main-content">
         <div class="topbar">
-            <div><div class="topbar-title">Proceso de Matrícula</div><div class="topbar-sub">Período 2026-I</div></div>
+            <div><div class="topbar-title">Proceso de Matrícula</div><div class="topbar-sub">Período <span th:text="${periodoActual}">2026-I</span></div></div>
             <span class="badge-period" style="background:#ECFDF5;color:#059669;border-color:#A7F3D0;"><i class="bi bi-circle-fill me-1" style="font-size:.5rem;"></i>Período activo</span>
         </div>
         <div class="page">
@@ -35,21 +35,20 @@
                     <div class="prereq-ok mb-3"><i class="bi bi-check-circle-fill"></i> <span>Prerrequisitos verificados automáticamente. Los cursos bloqueados requieren cursos aún no aprobados.</span></div>
                     
                     <form th:action="@{/matricula}" method="post" id="formMatricula">
-                        <input type="hidden" name="periodo" value="2026-I"/>
+                        <input type="hidden" name="periodo" th:value="${periodoActual}"/>
                         <div class="card-utp mb-3">
                             <div class="card-header-utp"><h5>Cursos disponibles</h5></div>
                             <div class="card-body-utp">
                                 <div class="row g-2" id="cursos-grid">
-                                    <div class="col-md-6" th:each="curso : ${cursos}">
+                                    <div class="col-md-6" th:each="horario : ${horarios}">
                                         <label class="curso-card" style="display:block; cursor:pointer;">
-                                            <input type="checkbox" name="horariosIds" th:value="${curso.id}" style="display:none;" onchange="this.parentElement.classList.toggle('selected', this.checked); updateSummary();"/>
+                                            <input type="checkbox" name="horariosIds" th:value="${horario.id}" th:data-creditos="${horario.curso.creditos}" style="display:none;" onchange="this.parentElement.classList.toggle('selected', this.checked); validarHorario(this);"/>
                                             <div class="check-circle"><i class="bi bi-check" style="font-size:.8rem;"></i></div>
-                                            <div class="curso-code" th:text="${curso.codigo}">COD</div>
-                                            <div class="curso-name" th:text="${curso.nombre}">Nombre del Curso</div>
-                                            <div class="curso-meta"><i class="bi bi-clock me-1"></i><span th:text="${curso.creditos}"></span> créditos</div>
-                                            <!-- Simulando horarios para el prototipo -->
-                                            <div class="curso-meta"><i class="bi bi-calendar me-1"></i>Lun/Mié 8:00–10:00</div>
-                                            <div class="curso-meta mt-1"><span class="badge-ok" style="font-size:.7rem;">Prerrequisito: OK</span></div>
+                                            <div class="curso-code" th:text="${horario.curso.codigo}">COD</div>
+                                            <div class="curso-name" th:text="${horario.curso.nombre}">Nombre del Curso</div>
+                                            <div class="curso-meta"><i class="bi bi-clock me-1"></i><span th:text="${horario.curso.creditos}"></span> créditos</div>
+                                            <div class="curso-meta"><i class="bi bi-calendar me-1"></i><span th:text="${horario.dia} + ' ' + ${horario.horas} + ' (Aula: ' + ${horario.aula} + ')'"></span></div>
+                                            <div class="curso-meta mt-1"><span class="badge-ok" style="font-size:.7rem;">Prof: <span th:text="${horario.docente.usuario.email}"></span></span></div>
                                         </label>
                                     </div>
                                 </div>
@@ -81,7 +80,33 @@
 function updateSummary() {
     const checkboxes = document.querySelectorAll('input[name="horariosIds"]:checked');
     document.getElementById('num-cursos').innerText = checkboxes.length;
-    // La suma de créditos requeriría atributos de datos, para el prototipo se muestra la cantidad.
+    let totalCred = 0;
+    checkboxes.forEach(cb => {
+        totalCred += parseInt(cb.getAttribute('data-creditos') || 0);
+    });
+    document.getElementById('total-cred').innerText = totalCred;
+}
+
+function validarHorario(checkbox) {
+    if (!checkbox.checked) {
+        updateSummary();
+        return;
+    }
+    const horarioId = checkbox.value;
+    fetch(`/matricula/validar?horarioId=${horarioId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (!data.ok) {
+                alert(data.motivo);
+                checkbox.checked = false;
+                checkbox.parentElement.classList.remove('selected');
+            }
+            updateSummary();
+        })
+        .catch(err => {
+            console.error(err);
+            updateSummary();
+        });
 }
 </script>
 

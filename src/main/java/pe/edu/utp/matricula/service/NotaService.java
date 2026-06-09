@@ -7,6 +7,8 @@ import pe.edu.utp.matricula.entity.Docente;
 import pe.edu.utp.matricula.entity.Nota;
 import pe.edu.utp.matricula.exception.RecursoNoEncontradoException;
 import pe.edu.utp.matricula.exception.ReglaNegocioException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import pe.edu.utp.matricula.repository.DetalleMatriculaRepository;
 import pe.edu.utp.matricula.repository.DocenteRepository;
 import pe.edu.utp.matricula.repository.NotaRepository;
@@ -17,6 +19,7 @@ import java.util.List;
 @Service
 public class NotaService {
 
+    private static final Logger log = LoggerFactory.getLogger(NotaService.class);
     private final NotaRepository notaRepository;
     private final DetalleMatriculaRepository detalleMatriculaRepository;
     private final DocenteRepository docenteRepository;
@@ -41,8 +44,14 @@ public class NotaService {
 
         boolean aprobado = valor.compareTo(new BigDecimal("10.5")) >= 0;
 
-        Nota nota = new Nota(dm, doc, valor, aprobado);
-        return notaRepository.save(nota);
+        Nota nota = notaRepository.findByDetalleMatriculaId(detalleMatriculaId)
+                .orElseGet(() -> new Nota(dm, doc, valor, aprobado));
+        nota.setValor(valor);
+        nota.setAprobado(aprobado);
+        nota.setDocente(doc);
+        Nota saved = notaRepository.save(nota);
+        log.info("Nota registrada. Detalle ID: {}, Docente ID: {}, Valor: {}, Aprobado: {}", detalleMatriculaId, docenteId, valor, aprobado);
+        return saved;
     }
 
     public List<Nota> buscarPorEstudiante(Long estudianteId) {

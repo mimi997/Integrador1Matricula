@@ -1,12 +1,14 @@
-CREATE TABLE usuario (
+CREATE TABLE IF NOT EXISTS usuario (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(100) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
-    rol ENUM('ADMIN', 'DOCENTE', 'ESTUDIANTE') NOT NULL,
-    activo BOOLEAN NOT NULL DEFAULT TRUE
+    rol VARCHAR(50) NOT NULL,
+    activo BOOLEAN NOT NULL DEFAULT TRUE,
+    nombres VARCHAR(100),
+    apellidos VARCHAR(100)
 );
 
-CREATE TABLE estudiante (
+CREATE TABLE IF NOT EXISTS estudiante (
     id BIGINT PRIMARY KEY,
     codigo_estudiante VARCHAR(20) NOT NULL UNIQUE,
     carrera VARCHAR(100) NOT NULL,
@@ -15,14 +17,14 @@ CREATE TABLE estudiante (
     CONSTRAINT fk_estudiante_usuario FOREIGN KEY (id) REFERENCES usuario(id)
 );
 
-CREATE TABLE docente (
+CREATE TABLE IF NOT EXISTS docente (
     id BIGINT PRIMARY KEY,
     codigo_docente VARCHAR(20) NOT NULL UNIQUE,
     especialidad VARCHAR(100) NOT NULL,
     CONSTRAINT fk_docente_usuario FOREIGN KEY (id) REFERENCES usuario(id)
 );
 
-CREATE TABLE curso (
+CREATE TABLE IF NOT EXISTS curso (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     codigo VARCHAR(20) NOT NULL UNIQUE,
     nombre VARCHAR(100) NOT NULL,
@@ -33,7 +35,7 @@ CREATE TABLE curso (
     activo BOOLEAN NOT NULL DEFAULT TRUE
 );
 
-CREATE TABLE prerrequisito (
+CREATE TABLE IF NOT EXISTS prerrequisito (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     curso_id BIGINT NOT NULL,
     curso_prereq_id BIGINT NOT NULL,
@@ -41,7 +43,7 @@ CREATE TABLE prerrequisito (
     CONSTRAINT fk_prereq_curso_prereq FOREIGN KEY (curso_prereq_id) REFERENCES curso(id)
 );
 
-CREATE TABLE horario (
+CREATE TABLE IF NOT EXISTS horario (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     curso_id BIGINT NOT NULL,
     docente_id BIGINT NOT NULL,
@@ -52,7 +54,7 @@ CREATE TABLE horario (
     CONSTRAINT fk_horario_docente FOREIGN KEY (docente_id) REFERENCES docente(id)
 );
 
-CREATE TABLE matricula (
+CREATE TABLE IF NOT EXISTS matricula (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     estudiante_id BIGINT NOT NULL,
     periodo VARCHAR(20) NOT NULL,
@@ -61,7 +63,7 @@ CREATE TABLE matricula (
     CONSTRAINT fk_matricula_estudiante FOREIGN KEY (estudiante_id) REFERENCES estudiante(id)
 );
 
-CREATE TABLE detalle_matricula (
+CREATE TABLE IF NOT EXISTS detalle_matricula (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     matricula_id BIGINT NOT NULL,
     horario_id BIGINT NOT NULL,
@@ -70,7 +72,7 @@ CREATE TABLE detalle_matricula (
     CONSTRAINT fk_detalle_horario FOREIGN KEY (horario_id) REFERENCES horario(id)
 );
 
-CREATE TABLE nota (
+CREATE TABLE IF NOT EXISTS nota (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     detalle_matricula_id BIGINT NOT NULL,
     docente_id BIGINT NOT NULL,
@@ -80,13 +82,13 @@ CREATE TABLE nota (
     CONSTRAINT fk_nota_docente FOREIGN KEY (docente_id) REFERENCES docente(id)
 );
 
-CREATE TABLE malla_curricular (
+CREATE TABLE IF NOT EXISTS malla_curricular (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     carrera VARCHAR(100) NOT NULL,
     anio INT NOT NULL
 );
 
-CREATE TABLE malla_curso (
+CREATE TABLE IF NOT EXISTS malla_curso (
     malla_id BIGINT NOT NULL,
     curso_id BIGINT NOT NULL,
     ciclo INT NOT NULL,
