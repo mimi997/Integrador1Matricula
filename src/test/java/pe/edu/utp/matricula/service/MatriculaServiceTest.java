@@ -37,9 +37,10 @@ class MatriculaServiceTest {
     @Mock private DetalleMatriculaRepository detalleMatriculaRepository;
     @Mock private ValidadorPrerrequisitos validadorPrerrequisitos;
     @Mock private DetectorConflictoHorario detectorConflictoHorario;
+    @Mock private PeriodoService periodoService;
 
     @InjectMocks
-    private MatriculaService matriculaService;
+    private pe.edu.utp.matricula.service.impl.MatriculaServiceImpl matriculaService;
 
     @Test
     void matricular_ConExito() {
@@ -52,16 +53,17 @@ class MatriculaServiceTest {
         Horario h = new Horario(c, null, "L", "8-10", "A");
         h.setId(1L);
 
-        when(estudianteRepository.findById(1L)).thenReturn(Optional.of(est));
-        when(horarioRepository.findById(1L)).thenReturn(Optional.of(h));
-        when(horarioRepository.findHorariosByEstudianteAndPeriodo(1L, "2023-1")).thenReturn(Collections.emptyList());
-        when(detectorConflictoHorario.hayConflicto(any(), any())).thenReturn(false);
-        doNothing().when(validadorPrerrequisitos).validar(anyLong(), any());
-
         Matricula mGuardada = new Matricula(est, "2023-1", Constantes.ESTADO_MATRICULA_CONFIRMADA, null);
         mGuardada.setId(1L);
+
+        when(periodoService.isActivo()).thenReturn(true);
+        when(estudianteRepository.findById(1L)).thenReturn(Optional.of(est));
         when(matriculaRepository.findByEstudianteIdAndPeriodo(1L, "2023-1")).thenReturn(Optional.empty());
         when(matriculaRepository.save(any(Matricula.class))).thenReturn(mGuardada);
+        when(detalleMatriculaRepository.findByMatriculaId(1L)).thenReturn(Collections.emptyList());
+        when(horarioRepository.findById(1L)).thenReturn(Optional.of(h));
+        when(detectorConflictoHorario.hayConflicto(any(), any())).thenReturn(false);
+        doNothing().when(validadorPrerrequisitos).validar(anyLong(), any());
 
         Matricula result = matriculaService.matricular(1L, List.of(1L), "2023-1");
 
@@ -82,7 +84,13 @@ class MatriculaServiceTest {
         Horario h = new Horario(c, null, "L", "8-10", "A");
         h.setId(1L);
 
+        Matricula mGuardada = new Matricula(est, "2023-1", Constantes.ESTADO_MATRICULA_CONFIRMADA, null);
+        mGuardada.setId(1L);
+
+        when(periodoService.isActivo()).thenReturn(true);
         when(estudianteRepository.findById(1L)).thenReturn(Optional.of(est));
+        when(matriculaRepository.findByEstudianteIdAndPeriodo(1L, "2023-1")).thenReturn(Optional.of(mGuardada));
+        when(detalleMatriculaRepository.findByMatriculaId(1L)).thenReturn(Collections.emptyList());
         when(horarioRepository.findById(1L)).thenReturn(Optional.of(h));
 
         assertThrows(ReglaNegocioException.class, () -> {
@@ -101,10 +109,24 @@ class MatriculaServiceTest {
         Horario h = new Horario(c, null, "L", "8-10", "A");
         h.setId(1L);
 
+        Matricula mGuardada = new Matricula(est, "2023-1", Constantes.ESTADO_MATRICULA_CONFIRMADA, null);
+        mGuardada.setId(1L);
+
+        when(periodoService.isActivo()).thenReturn(true);
         when(estudianteRepository.findById(1L)).thenReturn(Optional.of(est));
+        when(matriculaRepository.findByEstudianteIdAndPeriodo(1L, "2023-1")).thenReturn(Optional.of(mGuardada));
+        when(detalleMatriculaRepository.findByMatriculaId(1L)).thenReturn(Collections.emptyList());
         when(horarioRepository.findById(1L)).thenReturn(Optional.of(h));
-        when(horarioRepository.findHorariosByEstudianteAndPeriodo(1L, "2023-1")).thenReturn(List.of(h));
         when(detectorConflictoHorario.hayConflicto(any(), any())).thenReturn(true);
+
+        assertThrows(ReglaNegocioException.class, () -> {
+            matriculaService.matricular(1L, List.of(1L), "2023-1");
+        });
+    }
+
+    @Test
+    void matricular_ConPeriodoCerrado_LanzaExcepcion() {
+        when(periodoService.isActivo()).thenReturn(false);
 
         assertThrows(ReglaNegocioException.class, () -> {
             matriculaService.matricular(1L, List.of(1L), "2023-1");

@@ -59,10 +59,14 @@ INSERT IGNORE INTO prerrequisito (id, curso_id, curso_prereq_id) VALUES
 -- 6. Horarios Disponibles
 INSERT IGNORE INTO horario (id, curso_id, docente_id, dia, horas, aula) VALUES 
 (1, 4, 2, 'Lunes', '08:00-10:00', 'A-101'),
+(11, 4, 2, 'Miércoles', '10:00-12:00', 'A-101'), -- Horario alternativo para Matemática II
 (2, 5, 2, 'Martes', '10:00-12:00', 'A-102'),
 (3, 6, 2, 'Miércoles', '08:00-10:00', 'Lab-1'),
+(12, 6, 2, 'Jueves', '08:00-10:00', 'Lab-1'), -- Horario alternativo para Programación II
 (4, 7, 2, 'Jueves', '14:00-16:00', 'Lab-2'),
+(14, 7, 2, 'Lunes', '14:00-16:00', 'Lab-2'), -- Horario alternativo para Algoritmos
 (5, 8, 2, 'Viernes', '16:00-18:00', 'Lab-3'),
+(13, 8, 2, 'Sábado', '10:00-12:00', 'Lab-3'), -- Horario alternativo para Base de Datos
 (6, 1, 2, 'Lunes', '10:00-12:00', 'A-103'),
 (7, 3, 2, 'Martes', '14:00-16:00', 'Lab-4'),
 (8, 13, 2, 'Lunes', '18:00-20:00', 'Lab-5'),

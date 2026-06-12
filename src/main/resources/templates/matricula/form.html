@@ -4,11 +4,10 @@
 <body>
 
 <style>
-    .curso-card{border:1.5px solid var(--utp-border);border-radius:10px;padding:16px;cursor:pointer;transition:.2s;position:relative;background:#fff;}
-    .curso-card:hover{border-color:var(--utp-blue);box-shadow:0 2px 12px rgba(41,82,204,.1);}
+    .curso-card{border:1.5px solid var(--utp-border);border-radius:10px;padding:16px;transition:.2s;position:relative;background:#fff;}
     .curso-card.selected{border-color:var(--utp-blue);background:var(--utp-light);}
     .curso-card.blocked{opacity:.5;cursor:not-allowed;background:#fafafa;}
-    .check-circle{width:22px;height:22px;border-radius:50%;border:2px solid var(--utp-border);position:absolute;top:14px;right:14px;display:flex;align-items:center;justify-content:center;}
+    .check-circle{width:22px;height:22px;border-radius:50%;border:2px solid var(--utp-border);position:absolute;top:14px;right:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
     .curso-card.selected .check-circle{background:var(--utp-blue);border-color:var(--utp-blue);color:#fff;}
     .curso-code{font-size:.72rem;font-weight:700;color:var(--utp-blue);letter-spacing:.05em;}
     .curso-name{font-size:.92rem;font-weight:600;color:var(--utp-navy);margin:4px 0;}
@@ -39,17 +38,50 @@
                         <div class="card-utp mb-3">
                             <div class="card-header-utp"><h5>Cursos disponibles</h5></div>
                             <div class="card-body-utp">
-                                <div class="row g-2" id="cursos-grid">
-                                    <div class="col-md-6" th:each="horario : ${horarios}">
-                                        <label class="curso-card" style="display:block; cursor:pointer;">
-                                            <input type="checkbox" name="horariosIds" th:value="${horario.id}" th:data-creditos="${horario.curso.creditos}" style="display:none;" onchange="this.parentElement.classList.toggle('selected', this.checked); validarHorario(this);"/>
-                                            <div class="check-circle"><i class="bi bi-check" style="font-size:.8rem;"></i></div>
-                                            <div class="curso-code" th:text="${horario.curso.codigo}">COD</div>
-                                            <div class="curso-name" th:text="${horario.curso.nombre}">Nombre del Curso</div>
-                                            <div class="curso-meta"><i class="bi bi-clock me-1"></i><span th:text="${horario.curso.creditos}"></span> créditos</div>
-                                            <div class="curso-meta"><i class="bi bi-calendar me-1"></i><span th:text="${horario.dia} + ' ' + ${horario.horas} + ' (Aula: ' + ${horario.aula} + ')'"></span></div>
-                                            <div class="curso-meta mt-1"><span class="badge-ok" style="font-size:.7rem;">Prof: <span th:text="${horario.docente.usuario.email}"></span></span></div>
-                                        </label>
+                                <div class="row g-3" id="cursos-grid">
+                                    <div class="col-md-6" th:each="item : ${cursosMatricula}">
+                                        <div class="curso-card" th:classappend="${item.matriculado} ? 'selected' : ''" th:id="'card-' + ${item.curso.id}">
+                                            
+                                            <input type="checkbox" name="horariosIds" 
+                                                   th:id="'check-' + ${item.curso.id}"
+                                                   th:value="${item.matriculado ? item.horarioMatriculadoId : item.horarios[0].id}" 
+                                                   th:checked="${item.matriculado}"
+                                                   th:data-creditos="${item.curso.creditos}" 
+                                                   style="display:none;" 
+                                                   onchange="toggleSelection(this)"/>
+                                            
+                                            <div class="check-circle" th:onclick="'clickCard(' + ${item.curso.id} + ')'">
+                                                <i class="bi bi-check" style="font-size:.8rem;"></i>
+                                            </div>
+                                            
+                                            <div th:onclick="'clickCard(' + ${item.curso.id} + ')'" style="cursor:pointer; padding-right: 25px;">
+                                                <div class="curso-code" th:text="${item.curso.codigo}">COD</div>
+                                                <div class="curso-name" th:text="${item.curso.nombre}">Nombre del Curso</div>
+                                                <div class="curso-meta"><i class="bi bi-clock me-1"></i><span th:text="${item.curso.creditos}"></span> créditos</div>
+                                            </div>
+                                            
+                                            <div th:if="${item.matriculado}" class="mt-2 mb-1">
+                                                <span class="badge bg-success text-white" style="font-size: 0.7rem; font-weight: 600; padding: 4px 8px; border-radius: 6px;">
+                                                    <i class="bi bi-check-circle-fill me-1"></i>Matriculado
+                                                </span>
+                                            </div>
+                                            
+                                            <div class="mt-2">
+                                                <label class="form-label" style="font-size: 0.75rem; color: var(--utp-gray); font-weight: 600; margin-bottom: 2px;">
+                                                    Horario seleccionado:
+                                                </label>
+                                                <select class="form-select form-select-sm" style="font-size:0.78rem; border-radius: 6px;" 
+                                                        th:id="'select-' + ${item.curso.id}"
+                                                        onchange="changeHorario(this)">
+                                                    <option th:each="h : ${item.horarios}" 
+                                                            th:value="${h.id}" 
+                                                            th:text="${h.dia} + ' ' + ${h.horas} + ' (' + ${h.aula} + ') - Prof: ' + ${h.docente.usuario.nombres}"
+                                                            th:selected="${item.matriculado && item.horarioMatriculadoId == h.id}">
+                                                        Lunes 08:00-10:00 (A-101)
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -67,7 +99,7 @@
                                 <div style="display:flex;justify-content:space-between;font-size:.85rem;"><span style="color:var(--utp-gray);">Cursos seleccionados</span><strong id="num-cursos">0</strong></div>
                                 <div style="display:flex;justify-content:space-between;font-size:.85rem;margin-top:6px;"><span style="color:var(--utp-gray);">Total créditos</span><strong id="total-cred">0</strong></div>
                             </div>
-                            <button class="btn-primary-utp" style="width:100%;justify-content:center;" onclick="document.getElementById('formMatricula').submit();"><i class="bi bi-check2-circle"></i> Confirmar Matrícula</button>
+                            <button class="btn-primary-utp" style="width:100%;justify-content:center;" onclick="document.getElementById('formMatricula').submit();"><i class="bi bi-check2-circle"></i> Guardar Matrícula</button>
                         </div>
                     </div>
                 </div>
@@ -77,6 +109,33 @@
 </div>
 
 <script>
+function clickCard(cursoId) {
+    const cb = document.getElementById('check-' + cursoId);
+    cb.checked = !cb.checked;
+    toggleSelection(cb);
+}
+
+function toggleSelection(checkbox) {
+    const cursoId = checkbox.id.replace('check-', '');
+    const card = document.getElementById('card-' + cursoId);
+    if (checkbox.checked) {
+        card.classList.add('selected');
+        validarHorario(checkbox);
+    } else {
+        card.classList.remove('selected');
+        updateSummary();
+    }
+}
+
+function changeHorario(selectElement) {
+    const cursoId = selectElement.id.replace('select-', '');
+    const cb = document.getElementById('check-' + cursoId);
+    cb.value = selectElement.value;
+    if (cb.checked) {
+        validarHorario(cb);
+    }
+}
+
 function updateSummary() {
     const checkboxes = document.querySelectorAll('input[name="horariosIds"]:checked');
     document.getElementById('num-cursos').innerText = checkboxes.length;
@@ -99,7 +158,8 @@ function validarHorario(checkbox) {
             if (!data.ok) {
                 alert(data.motivo);
                 checkbox.checked = false;
-                checkbox.parentElement.classList.remove('selected');
+                const cursoId = checkbox.id.replace('check-', '');
+                document.getElementById('card-' + cursoId).classList.remove('selected');
             }
             updateSummary();
         })
@@ -108,6 +168,11 @@ function validarHorario(checkbox) {
             updateSummary();
         });
 }
+
+// Initial summary update on page load
+document.addEventListener('DOMContentLoaded', function() {
+    updateSummary();
+});
 </script>
 
 </body>

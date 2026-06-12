@@ -30,7 +30,7 @@ class NotaServiceTest {
     @Mock private DocenteRepository docenteRepository;
 
     @InjectMocks
-    private NotaService notaService;
+    private pe.edu.utp.matricula.service.impl.NotaServiceImpl notaService;
 
     @Test
     void registrarNota_ConExito() {

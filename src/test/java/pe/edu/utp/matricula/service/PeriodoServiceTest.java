@@ -7,14 +7,14 @@ public class PeriodoServiceTest {
 
     @Test
     public void testPeriodoInicial() {
-        PeriodoService periodoService = new PeriodoService();
+        PeriodoService periodoService = new pe.edu.utp.matricula.service.impl.PeriodoServiceImpl();
         assertEquals("2026-1", periodoService.getPeriodoActual());
         assertTrue(periodoService.isActivo());
     }
 
     @Test
     public void testCambioPeriodo() {
-        PeriodoService periodoService = new PeriodoService();
+        PeriodoService periodoService = new pe.edu.utp.matricula.service.impl.PeriodoServiceImpl();
         periodoService.setPeriodoActual("2026-2");
         periodoService.setActivo(false);
         

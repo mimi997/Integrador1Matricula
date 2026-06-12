@@ -20,7 +20,7 @@ class CursoServiceTest {
     private CursoRepository cursoRepository;
 
     @InjectMocks
-    private CursoService cursoService;
+    private pe.edu.utp.matricula.service.impl.CursoServiceImpl cursoService;
 
     @Test
     void listarCursosActivos() {

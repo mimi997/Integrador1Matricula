@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class DetectorConflictoHorarioTest {
 
-    private final DetectorConflictoHorario detector = new DetectorConflictoHorario();
+    private final DetectorConflictoHorario detector = new pe.edu.utp.matricula.service.impl.DetectorConflictoHorarioImpl();
 
     @Test
     void hayConflicto_SinConflictoAdyacente() {

@@ -61,13 +61,47 @@ public class MatriculaController {
                 .filter(h -> !idsAprobados.contains(h.getCurso().getId()))
                 .collect(java.util.stream.Collectors.toList());
                 
-        model.addAttribute("horarios", horariosDisponibles);
-        model.addAttribute("periodoActual", periodoService.getPeriodoActual());
+        String periodoActual = periodoService.getPeriodoActual();
+        Matricula matriculaActual = matriculaRepository.findByEstudianteIdAndPeriodo(user.getId(), periodoActual).orElse(null);
+        List<pe.edu.utp.matricula.entity.DetalleMatricula> detallesActuales = java.util.Collections.emptyList();
+        if (matriculaActual != null) {
+            detallesActuales = detalleMatriculaRepository.findByMatriculaId(matriculaActual.getId());
+        }
+
+        final List<pe.edu.utp.matricula.entity.DetalleMatricula> finalDetalles = detallesActuales;
+
+        List<pe.edu.utp.matricula.entity.Curso> cursosOrdenados = horariosDisponibles.stream()
+                .map(pe.edu.utp.matricula.entity.Horario::getCurso)
+                .distinct()
+                .sorted(java.util.Comparator.comparing(pe.edu.utp.matricula.entity.Curso::getCiclo)
+                        .thenComparing(pe.edu.utp.matricula.entity.Curso::getNombre))
+                .collect(java.util.stream.Collectors.toList());
+
+        List<CursoMatriculaDTO> cursosMatricula = new java.util.ArrayList<>();
+        for (pe.edu.utp.matricula.entity.Curso c : cursosOrdenados) {
+            List<pe.edu.utp.matricula.entity.Horario> horariosDeCurso = horariosDisponibles.stream()
+                    .filter(h -> h.getCurso().getId().equals(c.getId()))
+                    .collect(java.util.stream.Collectors.toList());
+
+            pe.edu.utp.matricula.entity.DetalleMatricula detalleEnrolled = finalDetalles.stream()
+                    .filter(d -> d.getHorario().getCurso().getId().equals(c.getId()))
+                    .findFirst()
+                    .orElse(null);
+
+            boolean matriculado = (detalleEnrolled != null);
+            Long horarioMatriculadoId = matriculado ? detalleEnrolled.getHorario().getId() : null;
+            Long detalleMatriculaId = matriculado ? detalleEnrolled.getId() : null;
+
+            cursosMatricula.add(new CursoMatriculaDTO(c, horariosDeCurso, matriculado, horarioMatriculadoId, detalleMatriculaId));
+        }
+
+        model.addAttribute("cursosMatricula", cursosMatricula);
+        model.addAttribute("periodoActual", periodoActual);
         return "matricula/form";
     }
 
     @PostMapping("/matricula")
-    public String procesarMatricula(@RequestParam List<Long> horariosIds,
+    public String procesarMatricula(@RequestParam(value = "horariosIds", required = false) List<Long> horariosIds,
                                     @RequestParam String periodo,
                                     Authentication auth,
                                     RedirectAttributes redirectAttributes) {
@@ -75,8 +109,12 @@ public class MatriculaController {
             Usuario user = usuarioRepository.findByEmailAndActivoTrue(auth.getName()).orElseThrow();
             Estudiante est = estudianteRepository.findById(user.getId()).orElseThrow();
 
+            if (horariosIds == null) {
+                horariosIds = java.util.Collections.emptyList();
+            }
+
             Matricula matricula = matriculaService.matricular(est.getId(), horariosIds, periodo);
-            redirectAttributes.addFlashAttribute("mensajeExito", "Matrícula realizada exitosamente");
+            redirectAttributes.addFlashAttribute("mensajeExito", "Matrícula actualizada exitosamente");
             return "redirect:/matricula/comprobante/" + matricula.getId();
         } catch (ReglaNegocioException ex) {
             redirectAttributes.addFlashAttribute("mensajeError", ex.getMessage());
@@ -130,12 +168,15 @@ public class MatriculaController {
             pe.edu.utp.matricula.entity.Horario horario = horarioRepository.findById(horarioId)
                     .orElseThrow(() -> new pe.edu.utp.matricula.exception.RecursoNoEncontradoException("Horario no encontrado"));
             
-            // Validar prerrequisitos
             validadorPrerrequisitos.validar(user.getId(), horario.getCurso());
             
-            // Validar conflicto de horario
+            // Validate conflict of schedule, excluding any active schedule of the same course
             List<pe.edu.utp.matricula.entity.Horario> horariosExistentes = horarioRepository.findHorariosByEstudianteAndPeriodo(user.getId(), periodoService.getPeriodoActual());
-            if (detectorConflictoHorario.hayConflicto(horario, horariosExistentes)) {
+            List<pe.edu.utp.matricula.entity.Horario> horariosFiltrados = horariosExistentes.stream()
+                    .filter(h -> !h.getCurso().getId().equals(horario.getCurso().getId()))
+                    .collect(java.util.stream.Collectors.toList());
+
+            if (detectorConflictoHorario.hayConflicto(horario, horariosFiltrados)) {
                 response.put("ok", false);
                 response.put("motivo", "Existe conflicto de horario con el curso: " + horario.getCurso().getNombre());
                 return response;
@@ -150,5 +191,27 @@ public class MatriculaController {
             response.put("motivo", "Error al validar.");
         }
         return response;
+    }
+
+    public static class CursoMatriculaDTO {
+        private final pe.edu.utp.matricula.entity.Curso curso;
+        private final List<pe.edu.utp.matricula.entity.Horario> horarios;
+        private final boolean matriculado;
+        private final Long horarioMatriculadoId;
+        private final Long detalleMatriculaId;
+
+        public CursoMatriculaDTO(pe.edu.utp.matricula.entity.Curso curso, List<pe.edu.utp.matricula.entity.Horario> horarios, boolean matriculado, Long horarioMatriculadoId, Long detalleMatriculaId) {
+            this.curso = curso;
+            this.horarios = horarios;
+            this.matriculado = matriculado;
+            this.horarioMatriculadoId = horarioMatriculadoId;
+            this.detalleMatriculaId = detalleMatriculaId;
+        }
+
+        public pe.edu.utp.matricula.entity.Curso getCurso() { return curso; }
+        public List<pe.edu.utp.matricula.entity.Horario> getHorarios() { return horarios; }
+        public boolean isMatriculado() { return matriculado; }
+        public Long getHorarioMatriculadoId() { return horarioMatriculadoId; }
+        public Long getDetalleMatriculaId() { return detalleMatriculaId; }
     }
 }

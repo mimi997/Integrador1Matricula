@@ -22,20 +22,20 @@ import static org.mockito.Mockito.when;
 class ValidadorPrerrequisitosTest {
 
     @Mock
-    private PrerrequisitoRepository prerrequisitoRepository;
+    private pe.edu.utp.matricula.util.CachePrerrequisitos cachePrerrequisitos;
 
     @Mock
     private EstudianteRepository estudianteRepository;
 
     @InjectMocks
-    private ValidadorPrerrequisitos validadorPrerrequisitos;
+    private pe.edu.utp.matricula.service.impl.ValidadorPrerrequisitosImpl validadorPrerrequisitos;
 
     @Test
     void validar_SinPrerrequisitos_Pasa() {
         Curso c = new Curso();
         c.setId(1L);
 
-        when(prerrequisitoRepository.findByCursoId(1L)).thenReturn(Collections.emptyList());
+        when(cachePrerrequisitos.getPrerrequisitos(1L)).thenReturn(com.google.common.collect.ImmutableList.of());
 
         validadorPrerrequisitos.validar(1L, c);
         // no exception thrown
@@ -53,7 +53,7 @@ class ValidadorPrerrequisitosTest {
 
         Prerrequisito p = new Prerrequisito(c, pre);
 
-        when(prerrequisitoRepository.findByCursoId(2L)).thenReturn(List.of(p));
+        when(cachePrerrequisitos.getPrerrequisitos(2L)).thenReturn(com.google.common.collect.ImmutableList.of(p));
         when(estudianteRepository.findCursosAprobados(1L)).thenReturn(List.of(pre));
 
         validadorPrerrequisitos.validar(1L, c);
@@ -71,7 +71,7 @@ class ValidadorPrerrequisitosTest {
 
         Prerrequisito p = new Prerrequisito(c, pre);
 
-        when(prerrequisitoRepository.findByCursoId(2L)).thenReturn(List.of(p));
+        when(cachePrerrequisitos.getPrerrequisitos(2L)).thenReturn(com.google.common.collect.ImmutableList.of(p));
         when(estudianteRepository.findCursosAprobados(1L)).thenReturn(Collections.emptyList());
 
         ReglaNegocioException ex = assertThrows(ReglaNegocioException.class, () -> {
@@ -79,5 +79,67 @@ class ValidadorPrerrequisitosTest {
         });
 
         assertThat(ex.getMessage()).contains("No cumple con el prerrequisito");
+    }
+
+    @Test
+    void validar_ConPrerrequisitoDesaprobado_LanzaExcepcion() {
+        Curso c = new Curso();
+        c.setId(2L);
+        c.setNombre("Mate II");
+
+        Curso pre = new Curso();
+        pre.setId(1L);
+        pre.setNombre("Mate I");
+
+        Prerrequisito p = new Prerrequisito(c, pre);
+
+        when(cachePrerrequisitos.getPrerrequisitos(2L)).thenReturn(com.google.common.collect.ImmutableList.of(p));
+        when(estudianteRepository.findCursosAprobados(1L)).thenReturn(Collections.emptyList());
+
+        ReglaNegocioException ex = assertThrows(ReglaNegocioException.class, () -> {
+            validadorPrerrequisitos.validar(1L, c);
+        });
+
+        assertThat(ex.getMessage()).contains("No cumple con el prerrequisito");
+    }
+
+    @Test
+    void cumplePrerrequisitos_SinPrerrequisitos_RetornaTrue() {
+        Curso c = new Curso();
+        c.setId(1L);
+        when(cachePrerrequisitos.getPrerrequisitos(1L)).thenReturn(com.google.common.collect.ImmutableList.of());
+
+        boolean result = validadorPrerrequisitos.cumplePrerrequisitos(1L, c);
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    void cumplePrerrequisitos_ConPrerrequisitoAprobado_RetornaTrue() {
+        Curso c = new Curso();
+        c.setId(2L);
+        Curso pre = new Curso();
+        pre.setId(1L);
+        Prerrequisito p = new Prerrequisito(c, pre);
+
+        when(cachePrerrequisitos.getPrerrequisitos(2L)).thenReturn(com.google.common.collect.ImmutableList.of(p));
+        when(estudianteRepository.findCursosAprobados(1L)).thenReturn(List.of(pre));
+
+        boolean result = validadorPrerrequisitos.cumplePrerrequisitos(1L, c);
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    void cumplePrerrequisitos_ConPrerrequisitoFaltante_RetornaFalse() {
+        Curso c = new Curso();
+        c.setId(2L);
+        Curso pre = new Curso();
+        pre.setId(1L);
+        Prerrequisito p = new Prerrequisito(c, pre);
+
+        when(cachePrerrequisitos.getPrerrequisitos(2L)).thenReturn(com.google.common.collect.ImmutableList.of(p));
+        when(estudianteRepository.findCursosAprobados(1L)).thenReturn(Collections.emptyList());
+
+        boolean result = validadorPrerrequisitos.cumplePrerrequisitos(1L, c);
+        assertThat(result).isFalse();
     }
 }

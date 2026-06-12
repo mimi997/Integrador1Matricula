@@ -20,7 +20,7 @@ class HorarioServiceTest {
     private HorarioRepository horarioRepository;
 
     @InjectMocks
-    private HorarioService horarioService;
+    private pe.edu.utp.matricula.service.impl.HorarioServiceImpl horarioService;
 
     @Test
     void listarHorariosPorCurso() {
